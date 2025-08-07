@@ -39,6 +39,7 @@ async function main() {
     { nombre: 'capacitacion', icono: 'fa-graduation-cap', color: 'bg-green-500/20 text-green-400 border-green-400/30' },
     { nombre: 'reunion', icono: 'fa-users', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30' },
     { nombre: 'incidente', icono: 'fa-exclamation-triangle', color: 'bg-red-500/20 text-red-400 border-red-400/30' },
+    { nombre: 'mantenimiento', icono: 'fa-tools', color: 'bg-blue-500/20 text-blue-400 border-blue-400/30' },
     { nombre: 'notificaciones', icono: 'fa-bell', color: 'bg-indigo-500/20 text-indigo-400 border-indigo-400/30' },
     { nombre: 'otro', icono: 'fa-calendar-alt', color: 'bg-gray-500/20 text-gray-400 border-gray-400/30' }
   ];
@@ -60,6 +61,9 @@ async function main() {
     { nombre: 'Nota', descripcion: 'Notas generales y recordatorios', icono: 'fa-sticky-note', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30' },
     { nombre: 'Checklist', descripcion: 'Listas de verificación', icono: 'fa-check-square', color: 'bg-orange-500/20 text-orange-400 border-orange-400/30' },
     { nombre: 'Incidente', descripcion: 'Documentación de incidentes', icono: 'fa-bug', color: 'bg-red-500/20 text-red-400 border-red-400/30' },
+    { nombre: 'Recordatorio', descripcion: 'Recordatorio importante', icono: 'fa-bell', color: 'bg-blue-500/20 text-blue-400 border-blue-400/30' },
+    { nombre: 'Idea', descripcion: 'Idea creativa', icono: 'fa-lightbulb', color: 'bg-yellow-200 text-yellow-600 border-yellow-400/30' },
+    { nombre: 'Tarea', descripcion: 'Tarea pendiente', icono: 'fa-tasks', color: 'bg-indigo-200 text-indigo-600 border-indigo-400/30' },
   ];
   for (const tn of tiposNotas) {
     const exists = await prisma.tipoNota.findUnique({ where: { nombre: tn.nombre } });
