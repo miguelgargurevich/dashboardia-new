@@ -30,7 +30,24 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
             const isSoon = diffHours <= 48;
             const isWeekend = start.getDay() === 0 || start.getDay() === 6;
             const isAlert = isSoon || isWeekend;
-            const tipo = tiposEventos?.find((t: any) => t.id === ev.eventType || t.nombre === ev.eventType);
+            const tipo = tiposEventos?.find((t: any) => t.id === ev.eventType || (typeof ev.eventType === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === ev.eventType.toLowerCase()));
+            // Icono: clase Tailwind o color hex
+            let iconClass = "text-2xl";
+            if (tipo?.color && !tipo?.color.startsWith('#') && tipo?.color.includes('text-')) {
+              iconClass += ` ${tipo.color}`;
+            }
+            let iconStyle = {};
+            if (tipo?.color && tipo?.color.startsWith('#')) {
+              iconStyle = { color: tipo.color };
+            }
+            let iconElement = null;
+            if (tipo?.icono) {
+              if (tipo.icono.startsWith('fa-')) {
+                iconElement = <i className={`fa ${tipo.icono} ${iconClass}`} style={iconStyle}></i>;
+              } else {
+                iconElement = <span className={iconClass} style={iconStyle}>{tipo.icono}</span>;
+              }
+            }
             return (
               <div
                 key={ev.id ?? idx}
@@ -47,10 +64,7 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
                     );
                   }}
                 >
-                  {tipo?.icono && (tipo.icono.startsWith('fa-')
-                    ? <span className={`text-2xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-                    : <span className="text-2xl" style={{ color: tipo.color }}>{tipo.icono}</span>
-                  )}
+                  {iconElement}
                   <span className={`font-bold text-base ${tipo?.color || 'text-primary dark:text-accent'} truncate max-w-xs`}>{ev.title}</span>
                   <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto whitespace-nowrap">{start.toLocaleString()}</span>
                   {isAlert && (

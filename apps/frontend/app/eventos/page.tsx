@@ -14,15 +14,33 @@ function EventList({ events, selectedId, onSelect, tiposEventos, onNew }: any) {
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">
         {events.map((event: any) => {
-          const tipo = tiposEventos.find((t: any) => t.id === event.eventType || t.nombre === event.eventType);
+          const tipo = tiposEventos.find((t: any) => t.id === event.eventType || (typeof event.eventType === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === event.eventType.toLowerCase()));
+          let borderClass = tipo && tipo.color && !tipo.color.startsWith('#') ? tipo.color.split(' ').find((c: string) => c.startsWith('border-')) : '';
+          let borderStyle = tipo && tipo.color && tipo.color.startsWith('#') ? { borderLeft: `4px solid ${tipo.color}` } : {};
+          // Render icon always, with color class or style
+          let iconClass = "text-xl";
+          if (tipo && tipo.color && !tipo.color.startsWith('#')) {
+            iconClass += ` ${tipo.color}`;
+          }
+          let iconStyle = {};
+          if (tipo && tipo.color && tipo.color.startsWith('#')) {
+            iconStyle = { color: tipo.color };
+          }
+          let iconElement = null;
+          if (tipo && tipo.icono) {
+            if (tipo.icono.startsWith('fa-')) {
+              iconElement = <i className={`fa ${tipo.icono} ${iconClass}`} style={iconStyle}></i>;
+            } else {
+              iconElement = <span className={iconClass} style={iconStyle}>{tipo.icono}</span>;
+            }
+          }
           return (
-            <li key={event.id} className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === event.id ? "bg-primary/10 dark:bg-accent/10" : ""}`}
+            <li key={event.id}
+                className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === event.id ? "bg-primary/10 dark:bg-accent/10" : ""} border-l-4 ${borderClass || ''}`}
+                style={borderStyle}
                 onClick={() => onSelect(event.id)}>
               <div className="flex items-center gap-2">
-                {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-                  ? <span className={`text-xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-                  : <span className="text-xl" style={{ color: tipo.color }}>{tipo.icono}</span>
-                )}
+                {iconElement}
                 <span className="font-semibold text-primary dark:text-accent">{event.title}</span>
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400">{tipo ? tipo.nombre : event.eventType}</div>
@@ -37,7 +55,7 @@ function EventList({ events, selectedId, onSelect, tiposEventos, onNew }: any) {
 function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditing, onSave, onCancel, isCreating }: any) {
   const [editData, setEditData] = useState<any>(event);
   useEffect(() => { setEditData(event); }, [event]);
-  const tipo = tiposEventos.find((t: any) => t.id === (isEditing || isCreating ? editData?.eventType : event?.eventType) || t.nombre === (isEditing || isCreating ? editData?.eventType : event?.eventType));
+  const tipo = tiposEventos.find((t: any) => t.id === (isEditing || isCreating ? editData?.eventType : event?.eventType) || (typeof (isEditing || isCreating ? editData?.eventType : event?.eventType) === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === (isEditing || isCreating ? editData?.eventType : event?.eventType).toLowerCase()));
   if (isEditing || isCreating) {
     return (
       <div className="flex-1 p-8">

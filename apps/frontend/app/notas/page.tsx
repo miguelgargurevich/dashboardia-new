@@ -13,15 +13,17 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
         <button className="text-primary dark:text-accent flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus /> Nueva</button>
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-        {notes.map((note: any) => {
+        {(Array.isArray(notes) ? notes : []).map((note: any) => {
           const tipo = tiposNotas.find((t: any) => t.id === note.tipo || t.nombre === note.tipo);
           return (
-            <li key={note.id} className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === note.id ? "bg-primary/10 dark:bg-accent/10" : ""}`}
+            <li key={note.id}
+                className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === note.id ? "bg-primary/10 dark:bg-accent/10" : ""} border-l-4 ${tipo ? tipo.color.split(' ')[1] : ''}`}
+                style={tipo && !tipo.color.startsWith('#') ? {} : { borderLeft: `4px solid ${tipo?.color || '#ccc'}` }}
                 onClick={() => onSelect(note.id)}>
               <div className="flex items-center gap-2">
                 {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-                  ? <span className={`text-xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-                  : <span className="text-xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+                  ? <span className={`text-xl`} style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
+                  : <span className="text-xl" style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
                 )}
                 <span className="font-semibold text-primary dark:text-accent">{note.title}</span>
               </div>
@@ -37,7 +39,7 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
 function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onCancel, isCreating }: any) {
   const [editData, setEditData] = useState<any>(note);
   useEffect(() => { setEditData(note); }, [note]);
-  const tipo = tiposNotas.find((t: any) => t.id === (isEditing || isCreating ? editData?.tipo : note?.tipo) || t.nombre === (isEditing || isCreating ? editData?.tipo : note?.tipo));
+  const tipo = (Array.isArray(tiposNotas) ? tiposNotas : []).find((t: any) => t.id === (isEditing || isCreating ? editData?.tipo : note?.tipo) || t.nombre === (isEditing || isCreating ? editData?.tipo : note?.tipo));
   if (isEditing || isCreating) {
     return (
       <div className="flex-1 p-8">
@@ -93,12 +95,12 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
   }
   if (!note) return <div className="flex-1 flex items-center justify-center text-gray-400">Selecciona una nota</div>;
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-8" style={tipo && !tipo.color.startsWith('#') ? {} : { borderLeft: `6px solid ${tipo?.color || '#ccc'}` }}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-accent flex items-center gap-2">
           {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-            ? <span className={`text-2xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-            : <span className="text-2xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+            ? <span className={`text-2xl`} style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
+            : <span className="text-2xl" style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
           )}
           {note.title}
         </h2>
@@ -111,8 +113,8 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
       <div className="mb-4 flex items-center gap-2">
         <span className="font-semibold">Tipo:</span>
         {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-          ? <span className={`text-xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-          : <span className="text-xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+          ? <span className={`text-xl`} style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
+          : <span className="text-xl" style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
         )}
         <span>{tipo ? tipo.nombre : note.tipo}</span>
       </div>
@@ -120,7 +122,14 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
         <span className="font-semibold">Recursos relacionados:</span>
         <div className="flex flex-wrap gap-2 mt-2">
           {note.relatedResources?.length > 0 ? note.relatedResources.map((r: string, i: number) => (
-            <span key={r + i} className="px-2 py-1 rounded bg-blue-100 text-blue-700 border border-blue-300 flex items-center gap-1"><FiFile /> {r}</span>
+            <span key={r + i} className="px-2 py-1 rounded flex items-center gap-1"
+              style={tipo && tipo.color ? { border: `1px solid ${tipo.color.startsWith('#') ? tipo.color : undefined}`, background: tipo.color.startsWith('#') ? tipo.color + '22' : undefined, color: tipo.color.startsWith('#') ? tipo.color : undefined } : {}}>
+              {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+                ? <span className={`text-lg`} style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
+                : <span className="text-lg" style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+              )}
+              {r}
+            </span>
           )) : <span className="text-xs text-gray-400">Sin recursos</span>}
         </div>
       </div>
@@ -154,9 +163,12 @@ export default function NotasRoute() {
   }, []);
 
   useEffect(() => {
-    setSelectedNote(notes.find(n => n.id === selectedId) || null);
+    setSelectedNote((Array.isArray(notes) ? notes : []).find(n => n.id === selectedId) || null);
     setIsEditing(false);
-    setIsCreating(false);
+    // Solo desactivar isCreating si no está en modo creación
+    if (!isCreating) {
+      setIsCreating(false);
+    }
   }, [selectedId, notes]);
 
   const handleEdit = () => setIsEditing(true);

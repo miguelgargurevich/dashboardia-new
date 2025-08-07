@@ -14,7 +14,7 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew }:
         <button className="text-primary dark:text-accent flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus /> Nuevo</button>
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-        {resources.map((resource: any) => {
+        {(Array.isArray(resources) ? resources : []).map((resource: any) => {
           const tipo = tiposRecursos.find((t: any) => t.id === resource.tipo || t.nombre === resource.tipo);
           return (
             <li key={resource.id} className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === resource.id ? "bg-primary/10 dark:bg-accent/10" : ""}`}
@@ -38,7 +38,8 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew }:
 function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, onSave, onCancel, isCreating }: any) {
   const [editData, setEditData] = useState<any>(resource);
   useEffect(() => { setEditData(resource); }, [resource]);
-  const tipo = tiposRecursos.find((t: any) => t.id === (isEditing || isCreating ? editData?.tipo : resource?.tipo) || t.nombre === (isEditing || isCreating ? editData?.tipo : resource?.tipo));
+  const safeTiposRecursos = Array.isArray(tiposRecursos) ? tiposRecursos : [];
+  const tipo = safeTiposRecursos.find((t: any) => t.id === (isEditing || isCreating ? editData?.tipo : resource?.tipo) || t.nombre === (isEditing || isCreating ? editData?.tipo : resource?.tipo));
   if (isEditing || isCreating) {
     return (
       <div className="flex-1 p-8">
@@ -77,12 +78,6 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
               <option key={t.id} value={t.id}>{t.nombre}</option>
             ))}
           </select>
-          <input
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
-            value={editData?.tags?.join(", ") || ""}
-            onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
-            placeholder="Tags (separados por coma)"
-          />
           <input
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring"
             value={editData?.url || ""}

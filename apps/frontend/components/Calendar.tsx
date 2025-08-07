@@ -120,16 +120,30 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
             </h3>
           </div>
           {grouped[selectedDate].map((ev, idx) => {
-            const tipo = tiposEventos?.find((t: any) => t.id === ev.eventType || t.nombre === ev.eventType);
+            const tipo = tiposEventos?.find((t: any) => t.id === ev.eventType || (typeof ev.eventType === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === ev.eventType.toLowerCase()));
+            // Icono: clase Tailwind o color hex (igual que Notas/Recursos/Eventos)
+            let iconClass = "text-base";
+            if (tipo?.color && !tipo?.color.startsWith('#') && tipo?.color.includes('text-')) {
+              iconClass += ` ${tipo.color}`;
+            }
+            let iconStyle = {};
+            if (tipo?.color && tipo?.color.startsWith('#')) {
+              iconStyle = { color: tipo.color };
+            }
+            let iconElement = null;
+            if (tipo?.icono) {
+              if (tipo.icono.startsWith('fa-')) {
+                iconElement = <i className={`fa ${tipo.icono} ${iconClass}`} style={iconStyle}></i>;
+              } else {
+                iconElement = <span className={iconClass} style={iconStyle}>{tipo.icono}</span>;
+              }
+            }
             return (
               <div key={ev.id ?? idx} className="bg-white dark:bg-darkBg rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 w-full">
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold mr-2 ${tipo?.color || 'bg-primary/10 text-primary border border-primary/20'}`}
-                    style={tipo?.color && !tipo?.color.startsWith('bg-') ? { background: tipo.color } : {}}>
-                    {tipo?.icono && (tipo.icono.startsWith('fa-')
-                      ? <span className={`text-base ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-                      : <span className="text-base" style={{ color: tipo.color }}>{tipo.icono}</span>
-                    )}
+                    style={tipo?.color && !tipo?.color.startsWith('bg-') && !tipo?.color.includes('text-') ? { background: tipo.color } : {}}>
+                    {iconElement}
                     {ev.eventType}
                   </span>
                   <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
@@ -142,10 +156,7 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
                   )}
                 </div>
                 <h3 className="text-lg font-bold mb-1 text-primary dark:text-accent flex items-center gap-2">
-                  {tipo?.icono && (tipo.icono.startsWith('fa-')
-                    ? <span className={`text-xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-                    : <span className="text-xl" style={{ color: tipo.color }}>{tipo.icono}</span>
-                  )}
+                  {iconElement}
                   {ev.title}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-2 text-base">{ev.description}</p>
