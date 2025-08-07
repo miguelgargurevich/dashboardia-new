@@ -10,21 +10,25 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew }:
   return (
     <div className="w-1/3 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto">
       <div className="flex items-center justify-between px-4 py-2 border-b dark:border-gray-700">
-        <h2 className="text-lg font-bold text-primary dark:text-accent">Recursos</h2>
-        <button className="text-primary dark:text-accent flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus /> Nuevo</button>
+        <h2 className="text-lg font-bold text-primary dark:text-primary">Recursos</h2>
+        <button className="text-primary dark:text-primary flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus className="text-primary dark:text-primary" /> Nuevo</button>
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">
         {(Array.isArray(resources) ? resources : []).map((resource: any) => {
           const tipo = tiposRecursos.find((t: any) => t.id === resource.tipo || t.nombre === resource.tipo);
+          // Extraer color hexadecimal
+          let iconColor = tipo?.color || '';
           return (
             <li key={resource.id} className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === resource.id ? "bg-primary/10 dark:bg-accent/10" : ""}`}
+                style={iconColor ? { borderLeft: `4px solid ${iconColor}` } : {}}
                 onClick={() => onSelect(resource.id)}>
               <div className="flex items-center gap-2">
-                {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-                  ? <span className={`text-xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-                  : <span className="text-xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+                {tipo && tipo.icono && (
+                  tipo.icono.startsWith('fa-')
+                    ? <span className="text-xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
+                    : <span className="text-xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
                 )}
-                <span className="font-semibold text-primary dark:text-accent">{resource.titulo || resource.nombre}</span>
+                <span className="font-semibold text-primary dark:text-primary">{resource.titulo || resource.nombre}</span>
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400">{tipo ? tipo.nombre : resource.tipo}</div>
             </li>
@@ -40,6 +44,8 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
   useEffect(() => { setEditData(resource); }, [resource]);
   const safeTiposRecursos = Array.isArray(tiposRecursos) ? tiposRecursos : [];
   const tipo = safeTiposRecursos.find((t: any) => t.id === (isEditing || isCreating ? editData?.tipo : resource?.tipo) || t.nombre === (isEditing || isCreating ? editData?.tipo : resource?.tipo));
+  // Color hexadecimal para el icono
+  let iconColor = tipo?.color || '';
   if (isEditing || isCreating) {
     return (
       <div className="flex-1 p-8">
@@ -55,9 +61,10 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
               placeholder="Título o nombre"
               required
             />
-            {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-              ? <span className={`text-2xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-              : <span className="text-2xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+            {tipo && tipo.icono && (
+              tipo.icono.startsWith('fa-')
+                ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
+                : <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
             )}
           </div>
           <textarea
@@ -97,9 +104,10 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
     <div className="flex-1 p-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-accent flex items-center gap-2">
-          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-            ? <span className={`text-2xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-            : <span className="text-2xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+          {tipo && tipo.icono && (
+            tipo.icono.startsWith('fa-')
+              ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
+              : <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
           )}
           {resource.titulo || resource.nombre}
         </h2>
@@ -111,9 +119,10 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
       <div className="mb-4 text-gray-700 dark:text-gray-200 whitespace-pre-line">{resource.descripcion}</div>
       <div className="mb-4 flex items-center gap-2">
         <span className="font-semibold">Tipo:</span>
-        {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-          ? <span className={`text-xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-          : <span className="text-xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+        {tipo && tipo.icono && (
+          tipo.icono.startsWith('fa-')
+            ? <span className="text-xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
+            : <span className="text-xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
         )}
         <span>{tipo ? tipo.nombre : resource.tipo}</span>
       </div>
@@ -189,7 +198,7 @@ export default function RecursosRoute() {
   };
 
   return (
-    <div className="flex h-[80vh] bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
+    <div className="flex h-screen bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
       <ResourceList resources={resources} selectedId={selectedId} onSelect={setSelectedId} tiposRecursos={tiposRecursos} onNew={handleNew} />
       <ResourceViewer
         resource={isCreating ? newResource : selectedResource}

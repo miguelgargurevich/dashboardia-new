@@ -19,8 +19,8 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-extrabold text-primary dark:text-accent flex items-center gap-2 mb-4 tracking-tight">
-        <FiClock className="text-2xl text-primary dark:text-accent" /> Próximos eventos
+      <h2 className="text-xl font-extrabold text-primary dark:text-primary flex items-center gap-2 mb-4 tracking-tight">
+        <FiClock className="text-2xl text-primary dark:text-primary" /> Próximos eventos
       </h2>
       <div className="space-y-4">
         {upcoming.length > 0 ? (
@@ -31,21 +31,13 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
             const isWeekend = start.getDay() === 0 || start.getDay() === 6;
             const isAlert = isSoon || isWeekend;
             const tipo = tiposEventos?.find((t: any) => t.id === ev.eventType || (typeof ev.eventType === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === ev.eventType.toLowerCase()));
-            // Icono: clase Tailwind o color hex
-            let iconClass = "text-2xl";
-            if (tipo?.color && !tipo?.color.startsWith('#') && tipo?.color.includes('text-')) {
-              iconClass += ` ${tipo.color}`;
-            }
-            let iconStyle = {};
-            if (tipo?.color && tipo?.color.startsWith('#')) {
-              iconStyle = { color: tipo.color };
-            }
+            let iconColor = tipo?.color || '';
             let iconElement = null;
             if (tipo?.icono) {
               if (tipo.icono.startsWith('fa-')) {
-                iconElement = <i className={`fa ${tipo.icono} ${iconClass}`} style={iconStyle}></i>;
+                iconElement = <i className={`fa ${tipo.icono} text-2xl`} style={iconColor ? { color: iconColor } : {}}></i>;
               } else {
-                iconElement = <span className={iconClass} style={iconStyle}>{tipo.icono}</span>;
+                iconElement = <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>;
               }
             }
             return (
@@ -65,8 +57,8 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
                   }}
                 >
                   {iconElement}
-                  <span className={`font-bold text-base ${tipo?.color || 'text-primary dark:text-accent'} truncate max-w-xs`}>{ev.title}</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto whitespace-nowrap">{start.toLocaleString()}</span>
+                  <span className={`font-bold text-base text-primary dark:text-primary truncate max-w-xs`}>{ev.title}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto whitespace-nowrap">{start.toLocaleDateString()}</span>
                   {isAlert && (
                     <span className="flex items-center gap-1 ml-2">
                       <FiAlertCircle className="text-lg text-red-600 dark:text-red-400" />

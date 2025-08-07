@@ -16,7 +16,7 @@ export default function ThemeToggle() {
   return (
     <button
       aria-label="Toggle dark mode"
-      className="p-2 rounded-full bg-secondary text-white dark:bg-darkBg dark:text-accent transition"
+      className="p-2 rounded-full bg-secondary text-white dark:bg-darkBg dark:text-primary transition"
       onClick={() => setDark((d) => !d)}
     >
       {dark ? <FaSun size={20} /> : <FaMoon size={20} />}

@@ -45,8 +45,8 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
 
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <FiCalendar className="text-2xl text-primary dark:text-accent mr-2" />
-          <h2 className="text-xl font-bold text-primary dark:text-accent">Calendario de eventos</h2>
+          <FiCalendar className="text-2xl text-primary dark:text-primary mr-2" />
+          <h2 className="text-xl font-bold text-primary dark:text-primary">Calendario de eventos</h2>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -99,7 +99,7 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
           >
             <span className={`font-semibold ${selectedDate === date ? "text-white" : ""}`}>{day}</span>
             {events.length > 0 && (
-              <span className={`text-xs ${selectedDate === date ? "text-white" : "text-primary dark:text-accent"}`}>{events.length} evento(s)</span>
+            <span className={`text-xs ${selectedDate === date ? "text-white" : "text-primary dark:text-primary"}`}>{events.length} evento(s)</span>
             )}
           </button>
         ))}
@@ -109,7 +109,7 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
         <div className="grid grid-cols-1 gap-4 mt-10">
           {/* Cabecera de eventos del día */}
           <div className="mb-2">
-            <h3 className="text-lg font-bold text-primary dark:text-accent">
+            <h3 className="text-lg font-bold text-primary dark:text-primary">
               {(() => {
                 const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
                 const fecha = new Date(selectedDate);
@@ -121,30 +121,24 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
           </div>
           {grouped[selectedDate].map((ev, idx) => {
             const tipo = tiposEventos?.find((t: any) => t.id === ev.eventType || (typeof ev.eventType === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === ev.eventType.toLowerCase()));
-            // Icono: clase Tailwind o color hex (igual que Notas/Recursos/Eventos)
-            let iconClass = "text-base";
-            if (tipo?.color && !tipo?.color.startsWith('#') && tipo?.color.includes('text-')) {
-              iconClass += ` ${tipo.color}`;
-            }
-            let iconStyle = {};
-            if (tipo?.color && tipo?.color.startsWith('#')) {
-              iconStyle = { color: tipo.color };
-            }
+            let iconColor = tipo?.color || '';
             let iconElement = null;
             if (tipo?.icono) {
               if (tipo.icono.startsWith('fa-')) {
-                iconElement = <i className={`fa ${tipo.icono} ${iconClass}`} style={iconStyle}></i>;
+                iconElement = <i className={`fa ${tipo.icono} text-base`} style={iconColor ? { color: iconColor } : {}}></i>;
               } else {
-                iconElement = <span className={iconClass} style={iconStyle}>{tipo.icono}</span>;
+                iconElement = <span className="text-base" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>;
               }
             }
             return (
               <div key={ev.id ?? idx} className="bg-white dark:bg-darkBg rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 w-full">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold mr-2 ${tipo?.color || 'bg-primary/10 text-primary border border-primary/20'}`}
-                    style={tipo?.color && !tipo?.color.startsWith('bg-') && !tipo?.color.includes('text-') ? { background: tipo.color } : {}}>
+                  <span
+                    className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold mr-2"
+                    style={iconColor ? { color: iconColor, border: `1px solid ${iconColor}` } : {}}
+                  >
                     {iconElement}
-                    {ev.eventType}
+                    <span>{ev.eventType}</span>
                   </span>
                   <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                     <FiClock className="text-gray-400" /> {ev.modo}
@@ -155,7 +149,8 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-bold mb-1 text-primary dark:text-accent flex items-center gap-2">
+                <h3 className="text-lg font-bold mb-1 flex items-center gap-2"
+                  style={iconColor ? { color: iconColor } : {}}>
                   {iconElement}
                   {ev.title}
                 </h3>

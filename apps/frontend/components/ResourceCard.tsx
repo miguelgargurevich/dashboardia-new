@@ -8,11 +8,11 @@ const iconMap: any = {
 
 export default function ResourceCard({ resource }: any) {
   return (
-    <div className="bg-white dark:bg-darkBg rounded-xl shadow-md p-5 flex flex-col gap-2 border-l-4" style={{ borderColor: resource.color || '#10b981' }}>
+    <div className="bg-white dark:bg-darkBg rounded-xl shadow-md p-5 flex flex-col gap-2 border-l-4" style={{ borderColor: resource.color || '#2563eb' }}>
       <div className="flex items-center gap-2">
         <span className="text-2xl">{iconMap[resource.tipo] || <FaBook />}</span>
-        <h3 className="font-bold text-lg text-primary dark:text-accent flex-1">{resource.titulo}</h3>
-        <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary dark:bg-accent/10 dark:text-accent uppercase">{resource.tipo}</span>
+        <h3 className="font-bold text-lg text-primary dark:text-primary flex-1">{resource.titulo}</h3>
+        <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary dark:bg-primary/10 dark:text-primary uppercase">{resource.tipo}</span>
       </div>
       <div className="text-gray-700 dark:text-gray-200 text-sm">{resource.descripcion}</div>
       <div className="flex flex-wrap gap-2 mt-2">

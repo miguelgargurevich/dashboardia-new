@@ -44,8 +44,8 @@ function NotasPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <FiTag /> Crear nota
+      <h1 className="text-2xl font-bold mb-6 flex items-center gap-2 text-primary dark:text-primary">
+        <FiTag className="text-primary dark:text-primary" /> Crear nota
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
         <input
@@ -53,7 +53,7 @@ function NotasPage() {
           value={nota.titulo}
           onChange={handleChange}
           placeholder="Título"
-          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring"
+          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900"
           required
         />
         <textarea
@@ -61,7 +61,7 @@ function NotasPage() {
           value={nota.contenido}
           onChange={handleChange}
           placeholder="Contenido"
-          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring"
+          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900"
           rows={4}
           required
         />
@@ -69,7 +69,7 @@ function NotasPage() {
           name="tipo"
           value={nota.tipo}
           onChange={handleChange}
-          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring"
+          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900"
           required
         >
           <option value="">Tipo de nota</option>
@@ -78,20 +78,20 @@ function NotasPage() {
           ))}
         </select>
         <div>
-          <label className="block font-semibold mb-2">Recursos asociados</label>
+          <label className="block font-semibold mb-2 text-primary dark:text-primary">Recursos asociados</label>
           <div className="flex flex-wrap gap-2">
             {recursos.map((r: any) => (
               <button
                 type="button"
                 key={r.id}
-                className={`px-2 py-1 rounded border flex items-center gap-1 ${nota.recursos.includes(r) ? "bg-primary text-white" : "bg-gray-100"}`}
+                className={`px-2 py-1 rounded border flex items-center gap-1 ${nota.recursos.includes(r) ? "bg-primary text-white" : "bg-gray-100 dark:bg-gray-800 dark:text-gray-100"}`}
                 onClick={() => setNota({ ...nota, recursos: nota.recursos.includes(r) ? nota.recursos.filter((x: any) => x !== r) : [...nota.recursos, r] })}
               >
-                <FiFile /> {r.nombre}
+                <FiFile className="text-primary dark:text-primary" /> {r.nombre}
               </button>
             ))}
             <a href="/recursos" className="px-2 py-1 rounded border bg-accent text-white flex items-center gap-1">
-              <FiPlus /> Agregar recurso
+              <FiPlus className="text-primary dark:text-primary" /> Agregar recurso
             </a>
           </div>
         </div>

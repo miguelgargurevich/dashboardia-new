@@ -26,7 +26,7 @@ export default function AssistantWidget() {
       {open ? (
         <div className="bg-white dark:bg-darkBg rounded-xl shadow-2xl p-4 w-80 flex flex-col gap-2 border border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center mb-2">
-            <span className="font-bold text-primary dark:text-accent flex items-center gap-2"><FaRobot /> Asistente IA</span>
+            <span className="font-bold text-primary dark:text-primary flex items-center gap-2"><FaRobot /> Asistente IA</span>
             <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-red-500"><FaTimes /></button>
           </div>
           <textarea

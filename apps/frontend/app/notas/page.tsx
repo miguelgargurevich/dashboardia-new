@@ -9,23 +9,28 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
   return (
     <div className="w-1/3 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto">
       <div className="flex items-center justify-between px-4 py-2 border-b dark:border-gray-700">
-        <h2 className="text-lg font-bold text-primary dark:text-accent">Notas</h2>
-        <button className="text-primary dark:text-accent flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus /> Nueva</button>
+        <h2 className="text-lg font-bold text-primary dark:text-primary">Notas</h2>
+        <button className="text-primary dark:text-primary flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus className="text-primary dark:text-primary" /> Nueva</button>
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">
         {(Array.isArray(notes) ? notes : []).map((note: any) => {
           const tipo = tiposNotas.find((t: any) => t.id === note.tipo || t.nombre === note.tipo);
           return (
             <li key={note.id}
-                className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === note.id ? "bg-primary/10 dark:bg-accent/10" : ""} border-l-4 ${tipo ? tipo.color.split(' ')[1] : ''}`}
-                style={tipo && !tipo.color.startsWith('#') ? {} : { borderLeft: `4px solid ${tipo?.color || '#ccc'}` }}
+                className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-primary/10 ${selectedId === note.id ? "bg-primary/10 dark:bg-primary/10" : ""}`}
+                style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `4px solid ${tipo.color}` } : {}}
                 onClick={() => onSelect(note.id)}>
               <div className="flex items-center gap-2">
                 {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-                  ? <span className={`text-xl`} style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
-                  : <span className="text-xl" style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+                  ? <span className="text-xl">
+                      <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                        style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+                    </span>
+                  : tipo.color && tipo.color.startsWith('text-')
+                    ? <span className={`text-xl ${tipo.color}`}>{tipo.icono}</span>
+                    : <span className="text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
                 )}
-                <span className="font-semibold text-primary dark:text-accent">{note.title}</span>
+                <span className="font-semibold text-primary dark:text-primary">{note.title}</span>
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400">{tipo ? tipo.nombre : note.tipo}</div>
             </li>
@@ -49,19 +54,16 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
         }}>
           <div className="flex items-center gap-2 mb-4">
             <input
-              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-accent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
               value={editData?.title || ""}
               onChange={e => setEditData({ ...editData, title: e.target.value })}
               placeholder="Título"
               required
             />
-            {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-              ? <span className={`text-2xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
-              : <span className="text-2xl" style={{ color: tipo.color }}>{tipo.icono}</span>
-            )}
+           
           </div>
           <textarea
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
             value={editData?.content || ""}
             onChange={e => setEditData({ ...editData, content: e.target.value })}
             rows={5}
@@ -69,7 +71,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
             required
           />
           <select
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none transition-colors"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none transition-colors"
             value={editData?.tipo || ""}
             onChange={e => setEditData({ ...editData, tipo: e.target.value })}
             required
@@ -80,7 +82,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
             ))}
           </select>
           <input
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
             value={editData?.tags?.join(", ") || ""}
             onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
             placeholder="Tags (separados por coma)"
@@ -95,12 +97,12 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
   }
   if (!note) return <div className="flex-1 flex items-center justify-center text-gray-400">Selecciona una nota</div>;
   return (
-    <div className="flex-1 p-8" style={tipo && !tipo.color.startsWith('#') ? {} : { borderLeft: `6px solid ${tipo?.color || '#ccc'}` }}>
+    <div className="flex-1 p-8" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-primary dark:text-accent flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-primary dark:text-primary flex items-center gap-2">
           {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-            ? <span className={`text-2xl`} style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
-            : <span className="text-2xl" style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+            ? <span className="text-2xl" style={tipo.color ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
+            : <span className="text-2xl" style={tipo.color ? { color: tipo.color } : {}}>{tipo.icono}</span>
           )}
           {note.title}
         </h2>
@@ -109,37 +111,47 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
           <button onClick={onDelete} className="p-2 rounded bg-red-500 text-white hover:bg-red-600"><FiTrash2 /></button>
         </div>
       </div>
-      <div className="mb-4 text-gray-700 dark:text-gray-200 whitespace-pre-line">{note.content}</div>
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-4 text-gray-700 dark:text-gray-100 whitespace-pre-line">{note.content}</div>
+      <div className="mb-4 flex items-center gap-2 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Tipo:</span>
-        {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-          ? <span className={`text-xl`} style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
-          : <span className="text-xl" style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
-        )}
+          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+            ? <span className="text-xl">
+                <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                  style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+              </span>
+            : tipo.color && tipo.color.startsWith('text-')
+              ? <span className={`text-xl ${tipo.color}`}>{tipo.icono}</span>
+              : <span className="text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+          )}
         <span>{tipo ? tipo.nombre : note.tipo}</span>
       </div>
-      <div className="mb-4">
+      <div className="mb-4 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Recursos relacionados:</span>
         <div className="flex flex-wrap gap-2 mt-2">
           {note.relatedResources?.length > 0 ? note.relatedResources.map((r: string, i: number) => (
             <span key={r + i} className="px-2 py-1 rounded flex items-center gap-1"
-              style={tipo && tipo.color ? { border: `1px solid ${tipo.color.startsWith('#') ? tipo.color : undefined}`, background: tipo.color.startsWith('#') ? tipo.color + '22' : undefined, color: tipo.color.startsWith('#') ? tipo.color : undefined } : {}}>
+              style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}>
               {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-                ? <span className={`text-lg`} style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
-                : <span className="text-lg" style={tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+                ? <span className="text-lg">
+                    <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                      style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+                  </span>
+                : tipo.color && tipo.color.startsWith('text-')
+                  ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+                  : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
               )}
               {r}
             </span>
-          )) : <span className="text-xs text-gray-400">Sin recursos</span>}
+          )) : <span className="text-xs text-gray-400 dark:text-gray-400">Sin recursos</span>}
         </div>
       </div>
-      <div className="mb-4">
+      <div className="mb-4 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Tags:</span> {note.tags?.join(", ")}
       </div>
-      <div className="mb-4">
+      <div className="mb-4 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Estado:</span> {note.status}
       </div>
-      <div className="mb-4">
+      <div className="mb-4 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Prioridad:</span> {note.priority}
       </div>
     </div>
@@ -211,7 +223,7 @@ export default function NotasRoute() {
   };
 
   return (
-    <div className="flex h-[80vh] bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
+    <div className="flex h-screen bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
       <NoteList notes={notes} selectedId={selectedId} onSelect={setSelectedId} tiposNotas={tiposNotas} onNew={handleNew} />
       <NoteViewer
         note={isCreating ? newNote : selectedNote}

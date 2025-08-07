@@ -15,7 +15,7 @@ export default function ModernForm({ onSubmit, initial = {}, fields, title }: an
         onSubmit(form);
       }}
     >
-      <h2 className="text-xl font-bold mb-2 text-primary dark:text-accent">{title}</h2>
+      <h2 className="text-xl font-bold mb-2 text-primary dark:text-primary">{title}</h2>
       {fields.map((f: any) => (
         <div key={f.name} className="flex flex-col gap-1">
           <label className="font-semibold text-sm text-gray-700 dark:text-gray-200">{f.label}</label>
