@@ -1,7 +1,7 @@
 import { FiClock, FiCalendar, FiAlertCircle } from "react-icons/fi";
 import { useState } from "react";
 
-export default function UpcomingEventsPanel({ events }: { events: any[] }) {
+export default function UpcomingEventsPanel({ events, tiposEventos }: { events: any[], tiposEventos?: any[] }) {
   const [expanded, setExpanded] = useState<number[]>([]);
   // Filtra eventos próximos (hoy o futuro)
   const now = new Date();
@@ -19,10 +19,10 @@ export default function UpcomingEventsPanel({ events }: { events: any[] }) {
 
   return (
     <div className="mb-8">
-      <h2 className="text-lg font-bold text-primary dark:text-accent flex items-center gap-2 mb-2">
-        <FiClock className="text-xl text-primary dark:text-accent" /> Próximos eventos
+      <h2 className="text-xl font-extrabold text-primary dark:text-accent flex items-center gap-2 mb-4 tracking-tight">
+        <FiClock className="text-2xl text-primary dark:text-accent" /> Próximos eventos
       </h2>
-      <div className="space-y-3">
+      <div className="space-y-4">
         {upcoming.length > 0 ? (
           upcoming.map((ev: any, idx: number) => {
             const start = new Date(ev.startDate);
@@ -30,10 +30,15 @@ export default function UpcomingEventsPanel({ events }: { events: any[] }) {
             const isSoon = diffHours <= 48;
             const isWeekend = start.getDay() === 0 || start.getDay() === 6;
             const isAlert = isSoon || isWeekend;
+            const tipo = tiposEventos?.find((t: any) => t.id === ev.eventType || t.nombre === ev.eventType);
             return (
-              <div key={ev.id ?? idx} className="bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-800 flex flex-col">
+              <div
+                key={ev.id ?? idx}
+                className="bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-shadow flex flex-col"
+                style={{ overflow: 'hidden' }}
+              >
                 <button
-                  className={`flex items-center gap-2 w-full text-left px-3 py-3 focus:outline-none ${expanded.includes(idx) ? "bg-primary/10" : ""}`}
+                  className={`flex items-center gap-3 w-full text-left px-5 py-4 focus:outline-none transition-colors duration-150 ${expanded.includes(idx) ? "bg-primary/10 dark:bg-accent/10" : ""}`}
                   onClick={() => {
                     setExpanded((expanded: number[]) =>
                       expanded.includes(idx)
@@ -42,9 +47,12 @@ export default function UpcomingEventsPanel({ events }: { events: any[] }) {
                     );
                   }}
                 >
-                  <FiCalendar className="text-primary" />
-                  <span className="font-semibold text-primary dark:text-accent">{ev.title}</span>
-                  <span className="text-xs text-gray-500 ml-auto">{start.toLocaleString()}</span>
+                  {tipo?.icono && (tipo.icono.startsWith('fa-')
+                    ? <span className={`text-2xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
+                    : <span className="text-2xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+                  )}
+                  <span className={`font-bold text-base ${tipo?.color || 'text-primary dark:text-accent'} truncate max-w-xs`}>{ev.title}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto whitespace-nowrap">{start.toLocaleString()}</span>
                   {isAlert && (
                     <span className="flex items-center gap-1 ml-2">
                       <FiAlertCircle className="text-lg text-red-600 dark:text-red-400" />
@@ -53,7 +61,7 @@ export default function UpcomingEventsPanel({ events }: { events: any[] }) {
                   )}
                 </button>
                 {expanded.includes(idx) && (
-                  <div className="px-3 pb-3">
+                  <div className="px-5 pb-4 bg-gray-50 dark:bg-gray-900/80 rounded-b-xl border-t border-gray-100 dark:border-gray-800">
                     {isSoon && (
                       <div className="text-xs text-red-600 dark:text-red-400 mt-1">
                         Este evento es muy próximo (menos de 48 horas).
@@ -65,7 +73,7 @@ export default function UpcomingEventsPanel({ events }: { events: any[] }) {
                       </div>
                     )}
                     {/* Detalle del evento */}
-                    <div className="mt-2 text-xs text-gray-700 dark:text-gray-300">
+                    <div className="mt-2 text-sm text-gray-700 dark:text-gray-200 space-y-1">
                       <div><span className="font-semibold">Inicio:</span> {start.toLocaleString()}</div>
                       <div><span className="font-semibold">Fin:</span> {ev.endDate ? new Date(ev.endDate).toLocaleString() : "-"}</div>
                       {ev.location && <div><span className="font-semibold">Ubicación:</span> {ev.location}</div>}
@@ -78,7 +86,7 @@ export default function UpcomingEventsPanel({ events }: { events: any[] }) {
             );
           })
         ) : (
-          <div className="text-sm text-gray-400">No hay próximos eventos.</div>
+          <div className="text-sm text-gray-400 dark:text-gray-500">No hay próximos eventos.</div>
         )}
       </div>
     </div>

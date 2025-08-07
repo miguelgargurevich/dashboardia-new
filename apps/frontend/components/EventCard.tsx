@@ -8,7 +8,7 @@ const iconMap: any = {
 
 export default function EventCard({ event }: any) {
   return (
-    <div className="bg-white dark:bg-darkBg rounded-xl shadow-md p-5 flex flex-col gap-2 border-l-4" style={{ borderColor: event.color || '#f59e42' }}>
+    <div className="bg-white dark:bg-gray-950 rounded-xl shadow-md p-5 flex flex-col gap-2 border-l-4" style={{ borderColor: event.color || '#f59e42' }}>
       <div className="flex items-center gap-2">
         <span className="text-2xl">{iconMap[event.eventType] || <FaCalendarAlt />}</span>
         <h3 className="font-bold text-lg text-primary dark:text-accent flex-1">{event.title}</h3>
@@ -20,8 +20,8 @@ export default function EventCard({ event }: any) {
         <span className="px-2 py-1 text-xs rounded bg-accent/10 text-accent dark:bg-accent/20">{event.location}</span>
       </div>
       <div className="flex justify-between items-center mt-2">
-        <span className="text-xs text-gray-400">Inicio: {event.startDate?.slice(0, 16).replace('T', ' ')}</span>
-        <span className="text-xs text-gray-400">Fin: {event.endDate?.slice(0, 16).replace('T', ' ')}</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">Inicio: {event.startDate?.slice(0, 16).replace('T', ' ')}</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">Fin: {event.endDate?.slice(0, 16).replace('T', ' ')}</span>
       </div>
     </div>
   );

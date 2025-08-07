@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { FiAlertCircle, FiClock, FiFile, FiUserCheck, FiTag, FiMapPin } from "react-icons/fi";
 
-export default function Calendar({ events }: { events: any[] }) {
+export default function Calendar({ events, tiposEventos }: { events: any[], tiposEventos?: any[] }) {
   // ...existing code...
   const today = new Date();
   const todayStr = today.toISOString().slice(0, 10);
@@ -36,7 +36,7 @@ export default function Calendar({ events }: { events: any[] }) {
     // Aquí podrías hacer un fetch al backend para obtener detalles del recurso si lo deseas
     // Por simplicidad, solo mostramos el ID
     return (
-      <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-300">Archivo: {resourceId}</span>
+      <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 border border-blue-300 dark:border-blue-800">Archivo: {resourceId}</span>
     );
   }
 
@@ -119,47 +119,59 @@ export default function Calendar({ events }: { events: any[] }) {
               })()}
             </h3>
           </div>
-          {grouped[selectedDate].map((ev, idx) => (
-            <div key={ev.id ?? idx} className="bg-white dark:bg-darkBg rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 w-full">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mr-2">
-                  <FiTag className="text-primary" /> {ev.eventType}
-                </span>
-                <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                  <FiClock className="text-gray-400" /> {ev.modo}
-                </span>
-                {ev.validador && (
-                  <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-indigo-100 text-indigo-700">
-                    <FiUserCheck className="text-indigo-500" /> {ev.validador}
+          {grouped[selectedDate].map((ev, idx) => {
+            const tipo = tiposEventos?.find((t: any) => t.id === ev.eventType || t.nombre === ev.eventType);
+            return (
+              <div key={ev.id ?? idx} className="bg-white dark:bg-darkBg rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 w-full">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold mr-2 ${tipo?.color || 'bg-primary/10 text-primary border border-primary/20'}`}
+                    style={tipo?.color && !tipo?.color.startsWith('bg-') ? { background: tipo.color } : {}}>
+                    {tipo?.icono && (tipo.icono.startsWith('fa-')
+                      ? <span className={`text-base ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
+                      : <span className="text-base" style={{ color: tipo.color }}>{tipo.icono}</span>
+                    )}
+                    {ev.eventType}
                   </span>
-                )}
-              </div>
-              <h3 className="text-lg font-bold mb-1 text-primary dark:text-accent flex items-center gap-2">
-                <FiCalendar className="text-primary" /> {ev.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-2 text-base">{ev.description}</p>
-              <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
-                <span className="flex items-center gap-1"><FiClock /> Inicio: {new Date(ev.startDate).toLocaleString()}</span>
-                <span className="flex items-center gap-1"><FiClock /> Fin: {new Date(ev.endDate).toLocaleString()}</span>
-                {ev.codigoDana && <span className="flex items-center gap-1"><FiFile /> Código Dana: {ev.codigoDana}</span>}
-              </div>
-              {/* Línea divisoria */}
-              <hr className="my-3 border-gray-200 dark:border-gray-700" />
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex flex-wrap gap-2">
-                  {ev.relatedResources && ev.relatedResources.length > 0 && ev.relatedResources.map((resId: string, i: number) => (
-                    <ResourceTag key={resId ?? i} resourceId={resId} />
-                  ))}
+                  <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                    <FiClock className="text-gray-400" /> {ev.modo}
+                  </span>
+                  {ev.validador && (
+                    <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-indigo-100 text-indigo-700">
+                      <FiUserCheck className="text-indigo-500" /> {ev.validador}
+                    </span>
+                  )}
                 </div>
-                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 ml-4 flex items-center gap-1">
-                  <FiFile /> Recursos: {ev.relatedResources ? ev.relatedResources.length : 0}
+                <h3 className="text-lg font-bold mb-1 text-primary dark:text-accent flex items-center gap-2">
+                  {tipo?.icono && (tipo.icono.startsWith('fa-')
+                    ? <span className={`text-xl ${tipo.color}`}><i className={`fa ${tipo.icono}`}></i></span>
+                    : <span className="text-xl" style={{ color: tipo.color }}>{tipo.icono}</span>
+                  )}
+                  {ev.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-2 text-base">{ev.description}</p>
+                <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <span className="flex items-center gap-1"><FiClock /> Inicio: {new Date(ev.startDate).toLocaleString()}</span>
+                  <span className="flex items-center gap-1"><FiClock /> Fin: {new Date(ev.endDate).toLocaleString()}</span>
+                  {ev.codigoDana && <span className="flex items-center gap-1"><FiFile /> Código Dana: {ev.codigoDana}</span>}
+                </div>
+                {/* Línea divisoria */}
+                <hr className="my-3 border-gray-200 dark:border-gray-700" />
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex flex-wrap gap-2">
+                    {ev.relatedResources && ev.relatedResources.length > 0 && ev.relatedResources.map((resId: string, i: number) => (
+                      <ResourceTag key={resId ?? i} resourceId={resId} />
+                    ))}
+                  </div>
+                  <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 ml-4 flex items-center gap-1">
+                    <FiFile /> Recursos: {ev.relatedResources ? ev.relatedResources.length : 0}
+                  </div>
+                </div>
+                <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
+                  {ev.location && <span className="flex items-center gap-1"><FiMapPin /> Ubicación: {ev.location}</span>}
                 </div>
               </div>
-              <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
-                {ev.location && <span className="flex items-center gap-1"><FiMapPin /> Ubicación: {ev.location}</span>}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

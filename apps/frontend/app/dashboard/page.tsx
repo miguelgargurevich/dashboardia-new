@@ -6,11 +6,13 @@ import EventCard from "../../components/EventCard";
 import Calendar from "../../components/Calendar";
 import UpcomingEventsPanel from "../../components/UpcomingEventsPanel";
 import { useEffect, useState } from "react";
+import { getTiposEventos } from "../../config/tipos";
 
 export default function DashboardPage() {
   const [notes, setNotes] = useState<any[]>([]);
   const [resources, setResources] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
+  const [tiposEventos, setTiposEventos] = useState<any[]>([]);
   const [loadingNotes, setLoadingNotes] = useState(true);
   const [loadingResources, setLoadingResources] = useState(true);
   const [loadingEvents, setLoadingEvents] = useState(true);
@@ -53,6 +55,8 @@ export default function DashboardPage() {
         setErrorEvents("Error al cargar eventos");
         setLoadingEvents(false);
       });
+
+    getTiposEventos().then(setTiposEventos);
   }, []);
 
   return (
@@ -60,10 +64,10 @@ export default function DashboardPage() {
       <h1 className="text-3xl font-bold mb-6 text-primary dark:text-accent">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="md:col-span-2">
-          <Calendar events={events} />
+          <Calendar events={events} tiposEventos={tiposEventos} />
         </div>
         <div>
-          <UpcomingEventsPanel events={events} />
+          <UpcomingEventsPanel events={events} tiposEventos={tiposEventos} />
         </div>
       </div>
     </main>
