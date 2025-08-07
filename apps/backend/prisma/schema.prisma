@@ -1,0 +1,105 @@
+enum EventType {
+  Reunion
+  Capacitacion
+  Mantenimiento
+  Incidente
+  Notificaciones
+  Otro
+}
+// Prisma schema for Dashboard IA Soporte
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  tipo        String
+  titulo      String
+  descripcion String?
+  url         String?
+  filePath    String?
+  tags        String[]
+  categoria   String?
+  fechaCarga  DateTime @default(now())
+}
+
+model Event {
+  id                 String   @id @default(cuid())
+  title              String
+  description        String?
+  startDate          DateTime
+  endDate            DateTime
+  location           String?
+  createdAt          DateTime @default(now())
+  codigoDana         String?
+  diaEnvio           String?
+  modo               String?
+  validador          String?
+  eventType          EventType
+  recurrencePattern  String
+  relatedResources   String[]
+}
+
+model Note {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  tipo        String   @default("nota")
+  tags        String[]
+  context     String?
+  keyPoints   String[]
+  status      String   @default("activo")
+  date        String?
+  priority    String?
+  relatedResources String[]
+  userId      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TipoEvento {
+  id          String   @id @default(cuid())
+  nombre      String   @unique
+  icono       String
+  color       String
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TipoNota {
+  id          String   @id @default(cuid())
+  nombre      String   @unique
+  descripcion String
+  icono       String
+  color       String
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TipoRecurso {
+  id          String   @id @default(cuid())
+  nombre      String   @unique
+  descripcion String
+  icono       String
+  color       String
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

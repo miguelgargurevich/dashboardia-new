@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  install-build-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: dashboard_user
+          POSTGRES_PASSWORD: dashboard_pass
+          POSTGRES_DB: dashboard_ia_soporte
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DATABASE_URL: postgresql://dashboard_user:dashboard_pass@localhost:5433/dashboard_ia_soporte
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Lint
+        run: npm run lint || true
+      - name: Build frontend
+        run: npm run build:frontend
+      - name: Prisma migrate & seed
+        run: |
+          cd apps/backend
+          npx prisma migrate deploy --schema=./prisma/schema.prisma
+          npm run prisma:seed
+      - name: Test (pendiente)
+        run: echo "Agregar tests aquí"

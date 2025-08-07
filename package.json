@@ -1,0 +1,22 @@
+{
+  "name": "dashboard-ia-soporte",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "apps/backend",
+    "packages/types",
+    "packages/utils"
+  ],
+  "scripts": {
+    "dev:frontend": "npm --workspace apps/frontend run dev",
+    "dev:backend": "npm --workspace apps/backend run dev",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:all": "npm run dev",
+    "build:frontend": "npm --workspace apps/frontend run build",
+    "build:backend": "npm --workspace apps/backend run build",
+    "build": "npm run build:frontend && npm run build:backend"
+  },
+  "devDependencies": {
+    "concurrently": "8.2.2"
+  }
+}
