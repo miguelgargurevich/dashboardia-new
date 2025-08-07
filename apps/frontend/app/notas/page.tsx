@@ -41,11 +41,15 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
   );
 }
 
-function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onCancel, isCreating }: any) {
+function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onCancel, isCreating, recursos }: any) {
   const [editData, setEditData] = useState<any>(note);
-  useEffect(() => { setEditData(note); }, [note]);
+  useEffect(() => {
+    setEditData({ ...note, relatedResources: Array.isArray(note?.relatedResources) ? note.relatedResources : [] });
+  }, [note]);
   const tipo = (Array.isArray(tiposNotas) ? tiposNotas : []).find((t: any) => t.id === (isEditing || isCreating ? editData?.tipo : note?.tipo) || t.nombre === (isEditing || isCreating ? editData?.tipo : note?.tipo));
   if (isEditing || isCreating) {
+    // Ensure relatedResources is always an array
+    const relatedResourcesArr = Array.isArray(editData?.relatedResources) ? editData.relatedResources : [];
     return (
       <div className="flex-1 p-8">
         <form className="space-y-4 max-w-xl" onSubmit={e => {
@@ -60,7 +64,6 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
               placeholder="Título"
               required
             />
-           
           </div>
           <textarea
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
@@ -88,7 +91,27 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
             onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
             placeholder="Tags (separados por coma)"
           />
-          <div className="flex gap-2">
+          <div>
+            <label className="block font-semibold mb-2">Recursos relacionados</label>
+            <div className="flex flex-wrap gap-2">
+              {recursos && recursos.map((r: any) => (
+                <button
+                  type="button"
+                  key={r.id}
+                  className={`px-2 py-1 rounded border flex items-center gap-1 ${relatedResourcesArr.includes(r.id) ? "bg-primary text-white" : "bg-gray-100"}`}
+                  onClick={() => setEditData({
+                    ...editData,
+                    relatedResources: relatedResourcesArr.includes(r.id)
+                      ? relatedResourcesArr.filter((x: any) => x !== r.id)
+                      : [...relatedResourcesArr, r.id]
+                  })}
+                >
+                  <FiFile /> {r.titulo || r.nombre}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-2 mt-4">
             <button type="submit" className="px-4 py-2 rounded bg-primary text-white font-bold hover:bg-primary/80">{isCreating ? "Crear" : "Guardar"}</button>
             <button type="button" className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold" onClick={onCancel}>Cancelar</button>
           </div>
@@ -164,9 +187,10 @@ export default function NotasRoute() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedNote, setSelectedNote] = useState<any>(null);
   const [tiposNotas, setTiposNotas] = useState<any[]>([]);
+  const [recursos, setRecursos] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [newNote, setNewNote] = useState<any>({ title: "", content: "", tipo: "", tags: [] });
+  const [newNote, setNewNote] = useState<any>({ title: "", content: "", tipo: "", tags: [], relatedResources: [] });
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -174,6 +198,7 @@ export default function NotasRoute() {
       .then(res => res.json())
       .then(setNotes);
     getTiposNotas().then(setTiposNotas);
+    import("../../config/tipos").then(mod => mod.getRecursos()).then(setRecursos);
   }, []);
 
   useEffect(() => {
@@ -248,6 +273,7 @@ export default function NotasRoute() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             tiposNotas={tiposNotas}
+            recursos={recursos}
             isEditing={isEditing}
             isCreating={isCreating}
             onSave={handleSave}

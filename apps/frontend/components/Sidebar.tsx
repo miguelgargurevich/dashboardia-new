@@ -1,8 +1,8 @@
-import { FaStickyNote, FaBook, FaCalendarAlt, FaUser, FaCog } from "react-icons/fa";
+import { FaStickyNote, FaBook, FaCalendarAlt, FaUser, FaCog, FaTachometerAlt } from "react-icons/fa";
 import Link from "next/link";
 
 const menu = [
-  { label: "Dashboard", icon: <FaStickyNote />, href: "/dashboard", type: "route" },
+  { label: "Dashboard", icon: <FaTachometerAlt />, href: "/dashboard", type: "route" },
   { label: "Notas", icon: <FaStickyNote />, href: "/notas", type: "route" },
   { label: "Recursos", icon: <FaBook />, href: "/recursos", type: "route" },
   { label: "Eventos", icon: <FaCalendarAlt />, href: "/eventos", type: "route" },
