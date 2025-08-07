@@ -223,18 +223,23 @@ export default function NotasRoute() {
   };
 
   return (
-    <div className="flex h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
-      <NoteList notes={notes} selectedId={selectedId} onSelect={setSelectedId} tiposNotas={tiposNotas} onNew={handleNew} />
-      <NoteViewer
-        note={isCreating ? newNote : selectedNote}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        tiposNotas={tiposNotas}
-        isEditing={isEditing}
-        isCreating={isCreating}
-        onSave={handleSave}
-        onCancel={handleCancel}
-      />
+    <div className="flex flex-col h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
+      <div className="w-full px-8 pt-4">
+        <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Notas</h1>
+      </div>
+      <div className="flex flex-1">
+        <NoteList notes={notes} selectedId={selectedId} onSelect={setSelectedId} tiposNotas={tiposNotas} onNew={handleNew} />
+        <NoteViewer
+          note={isCreating ? newNote : selectedNote}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          tiposNotas={tiposNotas}
+          isEditing={isEditing}
+          isCreating={isCreating}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
+      </div>
     </div>
   );
 }

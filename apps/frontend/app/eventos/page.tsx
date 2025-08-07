@@ -7,40 +7,42 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api"
 
 function EventList({ events, selectedId, onSelect, tiposEventos, onNew }: any) {
   return (
-    <div className="w-1/3 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto">
+    <div className="w-1/3 border-r border-gray-200 dark:border-gray-800 h-full min-h-0 flex flex-col">
       <div className="flex items-center justify-between px-4 py-2 border-b dark:border-gray-700">
         <h2 className="text-lg font-bold text-primary dark:text-primary">Eventos</h2>
         <button className="text-primary dark:text-primary flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus className="text-primary dark:text-primary" /> Nuevo</button>
       </div>
-      <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-        {events.map((event: any) => {
-          const tipo = tiposEventos.find((t: any) => t.id === event.eventType || (typeof event.eventType === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === event.eventType.toLowerCase()));
-          // Extraer color hexadecimal
-          let iconColor = tipo?.color || '';
-          let iconElement = null;
-          if (tipo && tipo.icono) {
-            if (tipo.icono.startsWith('fa-')) {
-              iconElement = <i className={`fa ${tipo.icono} text-base`} style={iconColor ? { color: iconColor } : {}}></i>;
-            } else {
-              iconElement = <span className="text-base" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>;
+      <div className="flex-1 overflow-y-auto">
+        <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+          {events.map((event: any) => {
+            const tipo = tiposEventos.find((t: any) => t.id === event.eventType || (typeof event.eventType === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === event.eventType.toLowerCase()));
+            // Extraer color hexadecimal
+            let iconColor = tipo?.color || '';
+            let iconElement = null;
+            if (tipo && tipo.icono) {
+              if (tipo.icono.startsWith('fa-')) {
+                iconElement = <i className={`fa ${tipo.icono} text-base`} style={iconColor ? { color: iconColor } : {}}></i>;
+              } else {
+                iconElement = <span className="text-base" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>;
+              }
             }
-          }
-          return (
-            <li key={event.id}
-                className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === event.id ? "bg-primary/10 dark:bg-accent/10" : ""}`}
-                style={iconColor ? { borderLeft: `4px solid ${iconColor}` } : {}}
-                onClick={() => onSelect(event.id)}>
-              <div className="flex items-center gap-2">
-                {iconElement && (
-                  <span className="text-xl">{iconElement}</span>
-                )}
-                <span className="font-semibold text-primary dark:text-primary">{event.title}</span>
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">{tipo ? tipo.nombre : event.eventType}</div>
-            </li>
-          );
-        })}
-      </ul>
+            return (
+              <li key={event.id}
+                  className={`cursor-pointer px-4 py-3 hover:bg-primary/10 dark:hover:bg-accent/10 ${selectedId === event.id ? "bg-primary/10 dark:bg-accent/10" : ""}`}
+                  style={iconColor ? { borderLeft: `4px solid ${iconColor}` } : {}}
+                  onClick={() => onSelect(event.id)}>
+                <div className="flex items-center gap-2">
+                  {iconElement && (
+                    <span className="text-xl">{iconElement}</span>
+                  )}
+                  <span className="font-semibold text-primary dark:text-primary">{event.title}</span>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{tipo ? tipo.nombre : event.eventType}</div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </div>
   );
 }
@@ -235,19 +237,24 @@ export default function EventosPage() {
   };
 
   return (
-    <div className="flex h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
-      <EventList events={events} selectedId={selectedId} onSelect={setSelectedId} tiposEventos={tiposEventos} onNew={handleNew} />
-      <EventViewer
-        event={isCreating ? newEvent : selectedEvent}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        tiposEventos={tiposEventos}
-        recursos={recursos}
-        isEditing={isEditing}
-        isCreating={isCreating}
-        onSave={handleSave}
-        onCancel={handleCancel}
-      />
+    <div className="flex flex-col h-screen min-h-0 bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
+      <div className="w-full px-8 pt-4">
+        <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Eventos</h1>
+      </div>
+      <div className="flex flex-1 min-h-0">
+        <EventList events={events} selectedId={selectedId} onSelect={setSelectedId} tiposEventos={tiposEventos} onNew={handleNew} />
+        <EventViewer
+          event={isCreating ? newEvent : selectedEvent}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          tiposEventos={tiposEventos}
+          recursos={recursos}
+          isEditing={isEditing}
+          isCreating={isCreating}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
+      </div>
     </div>
   );
 }

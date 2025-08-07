@@ -103,34 +103,34 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
   return (
     <div className="flex-1 p-8 bg-bg dark:bg-bg-dark rounded-lg shadow">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-primary dark:text-accent flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-primary dark:text-primary flex items-center gap-2">
           {tipo && tipo.icono && (
             tipo.icono.startsWith('fa-')
               ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
               : <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
           )}
-          {resource.titulo || resource.nombre}
+          <span className="text-gray-900 dark:text-gray-100">{resource.titulo || resource.nombre}</span>
         </h2>
         <div className="flex gap-2">
           <button onClick={onEdit} className="p-2 rounded bg-primary text-white hover:bg-primary/80"><FiEdit /></button>
           <button onClick={onDelete} className="p-2 rounded bg-red-500 text-white hover:bg-red-600"><FiTrash2 /></button>
         </div>
       </div>
-      <div className="mb-4 text-gray-700 dark:text-gray-200 whitespace-pre-line">{resource.descripcion}</div>
+      <div className="mb-4 text-gray-900 dark:text-gray-100 whitespace-pre-line">{resource.descripcion}</div>
       <div className="mb-4 flex items-center gap-2">
-        <span className="font-semibold">Tipo:</span>
+        <span className="font-semibold text-gray-900 dark:text-gray-100">Tipo:</span>
         {tipo && tipo.icono && (
           tipo.icono.startsWith('fa-')
             ? <span className="text-xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
             : <span className="text-xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
         )}
-        <span>{tipo ? tipo.nombre : resource.tipo}</span>
+        <span className="text-gray-900 dark:text-gray-100">{tipo ? tipo.nombre : resource.tipo}</span>
       </div>
       <div className="mb-4">
-        <span className="font-semibold">Tags:</span> {resource.tags?.join(", ")}
+        <span className="font-semibold text-gray-900 dark:text-gray-100">Tags:</span> <span className="text-gray-900 dark:text-gray-100">{resource.tags?.join(", ")}</span>
       </div>
       <div className="mb-4">
-        <span className="font-semibold">URL:</span> {resource.url ? <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">{resource.url}</a> : "Sin enlace"}
+        <span className="font-semibold text-gray-900 dark:text-gray-100">URL:</span> {resource.url ? <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">{resource.url}</a> : <span className="text-gray-900 dark:text-gray-100">Sin enlace</span>}
       </div>
     </div>
   );
@@ -198,18 +198,23 @@ export default function RecursosRoute() {
   };
 
   return (
-    <div className="flex h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
-      <ResourceList resources={resources} selectedId={selectedId} onSelect={setSelectedId} tiposRecursos={tiposRecursos} onNew={handleNew} />
-      <ResourceViewer
-        resource={isCreating ? newResource : selectedResource}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        tiposRecursos={tiposRecursos}
-        isEditing={isEditing}
-        isCreating={isCreating}
-        onSave={handleSave}
-        onCancel={handleCancel}
-      />
+    <div className="flex flex-col h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
+      <div className="w-full px-8 pt-4">
+        <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Recursos</h1>
+      </div>
+      <div className="flex flex-1">
+        <ResourceList resources={resources} selectedId={selectedId} onSelect={setSelectedId} tiposRecursos={tiposRecursos} onNew={handleNew} />
+        <ResourceViewer
+          resource={isCreating ? newResource : selectedResource}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          tiposRecursos={tiposRecursos}
+          isEditing={isEditing}
+          isCreating={isCreating}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
+      </div>
     </div>
   );
 }
