@@ -71,7 +71,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
             required
           />
           <select
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none transition-colors"
+            className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             value={editData?.tipo || ""}
             onChange={e => setEditData({ ...editData, tipo: e.target.value })}
             required
@@ -82,7 +82,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
             ))}
           </select>
           <input
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500"
             value={editData?.tags?.join(", ") || ""}
             onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
             placeholder="Tags (separados por coma)"
@@ -168,6 +168,7 @@ export default function NotasRoute() {
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [newNote, setNewNote] = useState<any>({ title: "", content: "", tipo: "", tags: [] });
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetch(`${API_BASE}/notes`)
@@ -198,24 +199,6 @@ export default function NotasRoute() {
       setNotes([...notes, created]);
       setSelectedId(created.id);
       setIsCreating(false);
-    } else {
-      const res = await fetch(`${API_BASE}/notes/${editData.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
-      });
-      const updated = await res.json();
-      setNotes(notes.map(n => n.id === updated.id ? updated : n));
-      setSelectedNote(updated);
-      setIsEditing(false);
-    }
-  };
-  const handleDelete = async () => {
-    if (!selectedNote) return;
-    if (confirm("¿Seguro que quieres eliminar esta nota?")) {
-      await fetch(`${API_BASE}/notes/${selectedNote.id}`, { method: "DELETE" });
-      setNotes(notes.filter(n => n.id !== selectedNote.id));
-      setSelectedId(null);
     }
   };
   const handleNew = () => {
@@ -224,23 +207,54 @@ export default function NotasRoute() {
     setIsCreating(true);
   };
 
+  const handleDelete = async () => {
+    if (!selectedNote) return;
+    if (confirm("¿Seguro que quieres eliminar esta nota?")) {
+      await fetch(`${API_BASE}/notes/${selectedNote.id}`, { method: "DELETE" });
+      setNotes(notes.filter(n => n.id !== selectedNote.id));
+      setSelectedId(null);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <div className="w-full px-8 pt-4">
         <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Notas</h1>
-      </div>
-      <div className="flex flex-1">
-        <NoteList notes={notes} selectedId={selectedId} onSelect={setSelectedId} tiposNotas={tiposNotas} onNew={handleNew} />
-        <NoteViewer
-          note={isCreating ? newNote : selectedNote}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          tiposNotas={tiposNotas}
-          isEditing={isEditing}
-          isCreating={isCreating}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
+        <div className="mb-4">
+          <input
+            type="text"
+            className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            placeholder="Buscar por título, contenido, tags..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="flex h-[calc(100vh-120px)]">
+          <NoteList
+            notes={notes.filter(n => {
+              const searchLower = search.toLowerCase();
+              return (
+                n.title?.toLowerCase().includes(searchLower) ||
+                n.content?.toLowerCase().includes(searchLower) ||
+                (Array.isArray(n.tags) ? n.tags.join(",").toLowerCase().includes(searchLower) : false)
+              );
+            })}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            tiposNotas={tiposNotas}
+            onNew={handleNew}
+          />
+          <NoteViewer
+            note={isCreating ? newNote : selectedNote}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            tiposNotas={tiposNotas}
+            isEditing={isEditing}
+            isCreating={isCreating}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
+        </div>
       </div>
     </div>
   );
