@@ -123,7 +123,7 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
   }
   if (!event) return <div className="flex-1 flex items-center justify-center text-gray-400">Selecciona un evento</div>;
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-8" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-accent flex items-center gap-2">
           {tipo && tipo.icono && (

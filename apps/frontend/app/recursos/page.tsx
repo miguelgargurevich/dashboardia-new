@@ -101,7 +101,7 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
   }
   if (!resource) return <div className="flex-1 flex items-center justify-center text-gray-400">Selecciona un recurso</div>;
   return (
-    <div className="flex-1 p-8 bg-bg dark:bg-bg-dark rounded-lg shadow">
+    <div className="flex-1 p-8 bg-bg dark:bg-bg-dark rounded-lg shadow" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-primary flex items-center gap-2">
           {tipo && tipo.icono && (
