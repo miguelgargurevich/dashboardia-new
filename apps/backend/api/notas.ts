@@ -1,19 +1,37 @@
-import { supabase } from "./supabase";
+import { prisma } from "../lib/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
-    const { titulo, contenido, tipo, recursos } = req.body;
-    const { error } = await supabase.from("notas").insert([
-      { titulo, contenido, tipo, recursos }
-    ]);
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json({ ok: true });
+    try {
+      const { titulo, contenido, tipo, recursos, tags, context, keyPoints, status, date, priority, relatedResources, userId } = req.body;
+      const nota = await prisma.note.create({
+        data: {
+          title: titulo,
+          content: contenido,
+          tipo,
+          tags,
+          context,
+          keyPoints,
+          status,
+          date,
+          priority,
+          relatedResources,
+          userId,
+        },
+      });
+      return res.status(200).json(nota);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
   }
   if (req.method === "GET") {
-    const { data, error } = await supabase.from("notas").select("*");
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data);
+    try {
+      const notas = await prisma.note.findMany();
+      return res.status(200).json(notas);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
   }
   res.status(405).end();
 }
