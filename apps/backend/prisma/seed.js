@@ -36,12 +36,12 @@ async function main() {
   }
   // Tipos de Eventos
   const tiposEventos = [
-    { nombre: 'capacitacion', icono: 'fa-graduation-cap', color: 'bg-green-500/20 text-green-400 border-green-400/30' },
-    { nombre: 'reunion', icono: 'fa-users', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30' },
-    { nombre: 'incidente', icono: 'fa-exclamation-triangle', color: 'bg-red-500/20 text-red-400 border-red-400/30' },
-    { nombre: 'mantenimiento', icono: 'fa-tools', color: 'bg-blue-500/20 text-blue-400 border-blue-400/30' },
-    { nombre: 'notificaciones', icono: 'fa-bell', color: 'bg-indigo-500/20 text-indigo-400 border-indigo-400/30' },
-    { nombre: 'otro', icono: 'fa-calendar-alt', color: 'bg-gray-500/20 text-gray-400 border-gray-400/30' }
+    { nombre: 'capacitacion', icono: 'fa-graduation-cap', color: '#22c55e' },
+    { nombre: 'reunion', icono: 'fa-users', color: '#facc15' },
+    { nombre: 'incidente', icono: 'fa-exclamation-triangle', color: '#ef4444' },
+    { nombre: 'mantenimiento', icono: 'fa-tools', color: '#3b82f6' },
+    { nombre: 'notificaciones', icono: 'fa-bell', color: '#6366f1' },
+    { nombre: 'otro', icono: 'fa-calendar-alt', color: '#6b7280' }
   ];
   for (const t of tiposEventos) {
     const exists = await prisma.tipoEvento.findUnique({ where: { nombre: t.nombre } });
@@ -56,14 +56,14 @@ async function main() {
   }
   // Tipos de Notas
   const tiposNotas = [
-    { nombre: 'Manual', descripcion: 'Manuales de usuario y técnicos', icono: 'fa-book', color: 'bg-green-500/20 text-green-400 border-green-400/30' },
-    { nombre: 'Guía', descripcion: 'Guías de referencia rápida', icono: 'fa-compass', color: 'bg-purple-500/20 text-purple-400 border-purple-400/30' },
-    { nombre: 'Nota', descripcion: 'Notas generales y recordatorios', icono: 'fa-sticky-note', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30' },
-    { nombre: 'Checklist', descripcion: 'Listas de verificación', icono: 'fa-check-square', color: 'bg-orange-500/20 text-orange-400 border-orange-400/30' },
-    { nombre: 'Incidente', descripcion: 'Documentación de incidentes', icono: 'fa-bug', color: 'bg-red-500/20 text-red-400 border-red-400/30' },
-    { nombre: 'Recordatorio', descripcion: 'Recordatorio importante', icono: 'fa-bell', color: 'bg-blue-500/20 text-blue-400 border-blue-400/30' },
-    { nombre: 'Idea', descripcion: 'Idea creativa', icono: 'fa-lightbulb', color: 'bg-yellow-200 text-yellow-600 border-yellow-400/30' },
-    { nombre: 'Tarea', descripcion: 'Tarea pendiente', icono: 'fa-tasks', color: 'bg-indigo-200 text-indigo-600 border-indigo-400/30' },
+    { nombre: 'Manual', descripcion: 'Manuales de usuario y técnicos', icono: 'fa-book', color: '#22c55e' },
+    { nombre: 'Guía', descripcion: 'Guías de referencia rápida', icono: 'fa-compass', color: '#a21caf' },
+    { nombre: 'Nota', descripcion: 'Notas generales y recordatorios', icono: 'fa-sticky-note', color: '#facc15' },
+    { nombre: 'Checklist', descripcion: 'Listas de verificación', icono: 'fa-check-square', color: '#fb923c' },
+    { nombre: 'Incidente', descripcion: 'Documentación de incidentes', icono: 'fa-bug', color: '#ef4444' },
+    { nombre: 'Recordatorio', descripcion: 'Recordatorio importante', icono: 'fa-bell', color: '#3b82f6' },
+    { nombre: 'Idea', descripcion: 'Idea creativa', icono: 'fa-lightbulb', color: '#fde68a' },
+    { nombre: 'Tarea', descripcion: 'Tarea pendiente', icono: 'fa-tasks', color: '#6366f1' },
   ];
   for (const tn of tiposNotas) {
     const exists = await prisma.tipoNota.findUnique({ where: { nombre: tn.nombre } });
@@ -78,14 +78,14 @@ async function main() {
   }
   // Tipos de Recursos
   const tiposRecursos = [
-    { nombre: 'Documentos PDF', descripcion: 'Archivos PDF y documentación', icono: 'fa-file-pdf', color: 'bg-red-500/20 text-red-400 border-red-400/30' },
-    { nombre: 'Enlaces Web', descripcion: 'URLs y recursos en línea', icono: 'fa-link', color: 'bg-blue-500/20 text-blue-400 border-blue-400/30' },
-    { nombre: 'Videos', descripcion: 'Contenido multimedia y tutoriales', icono: 'fa-video', color: 'bg-purple-500/20 text-purple-400 border-purple-400/30' },
-    { nombre: 'Archivos', descripcion: 'Documentos y archivos varios', icono: 'fa-file', color: 'bg-green-500/20 text-green-400 border-green-400/30' },
-    { nombre: 'Notas', descripcion: 'Notas y apuntes rápidos', icono: 'fa-sticky-note', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30' },
-    { nombre: 'Plantillas', descripcion: 'Formularios y plantillas', icono: 'fa-file-alt', color: 'bg-indigo-500/20 text-indigo-400 border-indigo-400/30' },
-    { nombre: 'Contactos', descripcion: 'Información de contactos externos', icono: 'fa-address-book', color: 'bg-pink-500/20 text-pink-400 border-pink-400/30' },
-    { nombre: 'Automatización IA', descripcion: 'Recursos de automatización e IA', icono: 'fa-robot', color: 'bg-cyan-500/20 text-cyan-400 border-cyan-400/30' }
+    { nombre: 'Documentos PDF', descripcion: 'Archivos PDF y documentación', icono: 'fa-file-pdf', color: '#ef4444' },
+    { nombre: 'Enlaces Web', descripcion: 'URLs y recursos en línea', icono: 'fa-link', color: '#3b82f6' },
+    { nombre: 'Videos', descripcion: 'Contenido multimedia y tutoriales', icono: 'fa-video', color: '#a21caf' },
+    { nombre: 'Archivos', descripcion: 'Documentos y archivos varios', icono: 'fa-file', color: '#22c55e' },
+    { nombre: 'Notas', descripcion: 'Notas y apuntes rápidos', icono: 'fa-sticky-note', color: '#facc15' },
+    { nombre: 'Plantillas', descripcion: 'Formularios y plantillas', icono: 'fa-file-alt', color: '#6366f1' },
+    { nombre: 'Contactos', descripcion: 'Información de contactos externos', icono: 'fa-address-book', color: '#ec4899' },
+    { nombre: 'Automatización IA', descripcion: 'Recursos de automatización e IA', icono: 'fa-robot', color: '#06b6d4' }
   ];
   for (const tr of tiposRecursos) {
     const exists = await prisma.tipoRecurso.findUnique({ where: { nombre: tr.nombre } });
