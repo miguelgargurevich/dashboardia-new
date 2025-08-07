@@ -96,8 +96,10 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
     );
   }
   if (!note) return <div className="flex-1 flex items-center justify-center text-gray-400">Selecciona una nota</div>;
+  // Colored left border for selected note type
+  const borderStyle = tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {};
   return (
-    <div className="flex-1 p-8" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
+    <div className="flex-1 p-8" style={borderStyle}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-primary flex items-center gap-2">
           {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
