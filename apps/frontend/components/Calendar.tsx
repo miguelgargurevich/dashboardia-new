@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiAlertCircle, FiClock, FiFile, FiUserCheck, FiTag, FiMapPin } from "react-icons/fi";
 
 export default function Calendar({ events }: { events: any[] }) {
   // ...existing code...
@@ -40,32 +42,43 @@ export default function Calendar({ events }: { events: any[] }) {
 
   return (
     <div className="bg-white dark:bg-darkBg rounded-lg shadow p-4">
+
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-bold text-primary dark:text-accent">Calendario de eventos</h2>
+        <div className="flex items-center gap-2">
+          <FiCalendar className="text-2xl text-primary dark:text-accent mr-2" />
+          <h2 className="text-xl font-bold text-primary dark:text-accent">Calendario de eventos</h2>
+        </div>
         <div className="flex items-center gap-2">
           <button
-            className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700"
+            className="px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-primary/10 transition-colors"
             onClick={() => {
               setCurrentMonth(m => m === 0 ? 11 : m - 1);
               if (currentMonth === 0) setCurrentYear(y => y - 1);
             }}
-          >{"<"}</button>
-          <span className="text-sm text-gray-400">{new Date(currentYear, currentMonth).toLocaleString("es", { month: "long", year: "numeric" })}</span>
+            aria-label="Mes anterior"
+          >
+            <FiChevronLeft className="text-lg" />
+          </button>
           <button
-            className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700"
-            onClick={() => {
-              setCurrentMonth(m => m === 11 ? 0 : m + 1);
-              if (currentMonth === 11) setCurrentYear(y => y + 1);
-            }}
-          >{">"}</button>
-          <button
-            className="ml-2 px-2 py-1 rounded bg-primary text-white border border-primary"
+            className="px-4 py-1 rounded-md bg-primary text-white border border-primary flex items-center gap-2 shadow hover:bg-primary/90 font-semibold transition-colors"
             onClick={() => {
               setCurrentMonth(today.getMonth());
               setCurrentYear(today.getFullYear());
               setSelectedDate(todayStr);
             }}
-          >Hoy</button>
+          >
+            <FiCalendar className="text-base" /> Hoy
+          </button>
+          <button
+            className="px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-primary/10 transition-colors"
+            onClick={() => {
+              setCurrentMonth(m => m === 11 ? 0 : m + 1);
+              if (currentMonth === 11) setCurrentYear(y => y + 1);
+            }}
+            aria-label="Mes siguiente"
+          >
+            <FiChevronRight className="text-lg" />
+          </button>
         </div>
       </div>
       {/* Cabeceras de los días de la semana */}
@@ -93,26 +106,57 @@ export default function Calendar({ events }: { events: any[] }) {
       </div>
       {/* Cards modernos para eventos del día seleccionado */}
       {selectedDate && grouped[selectedDate] && grouped[selectedDate].length > 0 && (
-        <div className="grid grid-cols-1 gap-4 mt-4">
+        <div className="grid grid-cols-1 gap-4 mt-10">
+          {/* Cabecera de eventos del día */}
+          <div className="mb-2">
+            <h3 className="text-lg font-bold text-primary dark:text-accent">
+              {(() => {
+                const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                const fecha = new Date(selectedDate);
+                const dia = String(fecha.getDate()).padStart(2, "0");
+                const mes = meses[fecha.getMonth()];
+                return `Eventos del día ${dia} de ${mes}`;
+              })()}
+            </h3>
+          </div>
           {grouped[selectedDate].map((ev, idx) => (
             <div key={ev.id ?? idx} className="bg-white dark:bg-darkBg rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 w-full">
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mr-2">{ev.eventType}</span>
-                <span className="px-2 py-1 rounded text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">{ev.modo}</span>
-                {ev.validador && <span className="px-2 py-1 rounded text-xs font-semibold bg-indigo-100 text-indigo-700">{ev.validador}</span>}
+                <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mr-2">
+                  <FiTag className="text-primary" /> {ev.eventType}
+                </span>
+                <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                  <FiClock className="text-gray-400" /> {ev.modo}
+                </span>
+                {ev.validador && (
+                  <span className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold bg-indigo-100 text-indigo-700">
+                    <FiUserCheck className="text-indigo-500" /> {ev.validador}
+                  </span>
+                )}
               </div>
-              <h3 className="text-lg font-bold mb-1 text-primary dark:text-accent">{ev.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-2">{ev.description}</p>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {ev.relatedResources && ev.relatedResources.length > 0 && ev.relatedResources.map((resId: string, i: number) => (
-                  <ResourceTag key={resId ?? i} resourceId={resId} />
-                ))}
+              <h3 className="text-lg font-bold mb-1 text-primary dark:text-accent flex items-center gap-2">
+                <FiCalendar className="text-primary" /> {ev.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-2 text-base">{ev.description}</p>
+              <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <span className="flex items-center gap-1"><FiClock /> Inicio: {new Date(ev.startDate).toLocaleString()}</span>
+                <span className="flex items-center gap-1"><FiClock /> Fin: {new Date(ev.endDate).toLocaleString()}</span>
+                {ev.codigoDana && <span className="flex items-center gap-1"><FiFile /> Código Dana: {ev.codigoDana}</span>}
+              </div>
+              {/* Línea divisoria */}
+              <hr className="my-3 border-gray-200 dark:border-gray-700" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-wrap gap-2">
+                  {ev.relatedResources && ev.relatedResources.length > 0 && ev.relatedResources.map((resId: string, i: number) => (
+                    <ResourceTag key={resId ?? i} resourceId={resId} />
+                  ))}
+                </div>
+                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 ml-4 flex items-center gap-1">
+                  <FiFile /> Recursos: {ev.relatedResources ? ev.relatedResources.length : 0}
+                </div>
               </div>
               <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
-                <span>Inicio: {new Date(ev.startDate).toLocaleString()}</span>
-                <span>Fin: {new Date(ev.endDate).toLocaleString()}</span>
-                {ev.location && <span>Ubicación: {ev.location}</span>}
-                {ev.codigoDana && <span>Código Dana: {ev.codigoDana}</span>}
+                {ev.location && <span className="flex items-center gap-1"><FiMapPin /> Ubicación: {ev.location}</span>}
               </div>
             </div>
           ))}
