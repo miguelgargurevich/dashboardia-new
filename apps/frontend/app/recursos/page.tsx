@@ -41,8 +41,19 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew, s
 
 function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, onSave, onCancel, isCreating }: any) {
   const [editData, setEditData] = useState<any>(resource);
-  useEffect(() => { setEditData(resource); }, [resource]);
   const safeTiposRecursos = Array.isArray(tiposRecursos) ? tiposRecursos : [];
+  useEffect(() => {
+    // Find tipo id if resource.tipo is nombre
+    let tipoId = resource?.tipo;
+    if (tipoId && safeTiposRecursos.length) {
+      const foundTipo = safeTiposRecursos.find(t => t.id === tipoId || t.nombre === tipoId);
+      tipoId = foundTipo ? foundTipo.id : "";
+    }
+    setEditData({
+      ...resource,
+      tipo: tipoId || "",
+    });
+  }, [resource, safeTiposRecursos]);
   const tipo = safeTiposRecursos.find((t: any) => t.id === (isEditing || isCreating ? editData?.tipo : resource?.tipo) || t.nombre === (isEditing || isCreating ? editData?.tipo : resource?.tipo));
   // Color hexadecimal para el icono
   let iconColor = tipo?.color || '';
@@ -215,6 +226,13 @@ export default function RecursosRoute() {
     setIsCreating(true);
   };
 
+  // Custom onSelect handler to exit edit/create mode when selecting from the list
+  const handleSelect = (id: string) => {
+    setSelectedId(id);
+    setIsEditing(false);
+    setIsCreating(false);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <div className="w-full px-8 pt-4">
@@ -240,7 +258,7 @@ export default function RecursosRoute() {
             );
           })}
           selectedId={selectedId}
-          onSelect={setSelectedId}
+          onSelect={handleSelect}
           tiposRecursos={tiposRecursos}
           onNew={handleNew}
           search={search}

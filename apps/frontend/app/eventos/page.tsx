@@ -49,13 +49,20 @@ function EventList({ events, selectedId, onSelect, tiposEventos, onNew, search, 
 
 function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditing, onSave, onCancel, isCreating }: any) {
   const [editData, setEditData] = useState<any>(event);
+  const safeTiposEventos = Array.isArray(tiposEventos) ? tiposEventos : [];
   useEffect(() => {
-    // Asegurar que relatedResources siempre sea un array
+    // Find eventType id if event.eventType is nombre
+    let eventTypeId = event?.eventType;
+    if (eventTypeId && safeTiposEventos.length) {
+      const foundTipo = safeTiposEventos.find(t => t.id === eventTypeId || (typeof eventTypeId === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === eventTypeId.toLowerCase()));
+      eventTypeId = foundTipo ? foundTipo.id : "";
+    }
     setEditData({
       ...event,
+      eventType: eventTypeId || "",
       relatedResources: Array.isArray(event?.relatedResources) ? event.relatedResources : [],
     });
-  }, [event]);
+  }, [event, safeTiposEventos]);
   const tipo = tiposEventos.find((t: any) => t.id === (isEditing || isCreating ? editData?.eventType : event?.eventType) || (typeof (isEditing || isCreating ? editData?.eventType : event?.eventType) === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === (isEditing || isCreating ? editData?.eventType : event?.eventType).toLowerCase()));
   // Color hexadecimal para el icono
   let iconColor = tipo?.color || '';
@@ -91,6 +98,7 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
           />
           <select
             className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            style={{ height: '42px' }}
             value={editData?.eventType || ""}
             onChange={e => setEditData({ ...editData, eventType: e.target.value })}
             required

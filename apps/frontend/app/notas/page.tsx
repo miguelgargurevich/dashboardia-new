@@ -44,12 +44,18 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
 function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onCancel, isCreating, recursos }: any) {
   const [editData, setEditData] = useState<any>(note);
   useEffect(() => {
-    setEditData({ ...note, relatedResources: Array.isArray(note?.relatedResources) ? note.relatedResources : [] });
+    setEditData({
+      ...note,
+      title: note?.title || note?.titulo || "",
+      relatedResources: Array.isArray(note?.relatedResources) ? note.relatedResources : [],
+    });
   }, [note]);
   const tipo = (Array.isArray(tiposNotas) ? tiposNotas : []).find((t: any) => t.id === (isEditing || isCreating ? editData?.tipo : note?.tipo) || t.nombre === (isEditing || isCreating ? editData?.tipo : note?.tipo));
   if (isEditing || isCreating) {
     // Ensure relatedResources is always an array
     const relatedResourcesArr = Array.isArray(editData?.relatedResources) ? editData.relatedResources : [];
+    // Color hexadecimal para el icono
+    let iconColor = tipo?.color || '';
     return (
       <div className="flex-1 p-8">
         <form className="space-y-4 max-w-xl" onSubmit={e => {
@@ -58,12 +64,17 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
         }}>
           <div className="flex items-center gap-2 mb-4">
             <input
-              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-accent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
               value={editData?.title || ""}
               onChange={e => setEditData({ ...editData, title: e.target.value })}
               placeholder="Título"
               required
             />
+            {tipo && tipo.icono && (
+              tipo.icono.startsWith('fa-')
+                ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
+                : <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
+            )}
           </div>
           <textarea
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
