@@ -72,6 +72,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
           />
           <select
             className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            style={{ height: '42px' }}
             value={editData?.tipo || ""}
             onChange={e => setEditData({ ...editData, tipo: e.target.value })}
             required
@@ -153,9 +154,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
       <div className="mb-4 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Estado:</span> {note.status}
       </div>
-      <div className="mb-4 text-gray-700 dark:text-gray-100">
-        <span className="font-semibold">Prioridad:</span> {note.priority}
-      </div>
+      {/* Prioridad field hidden as requested */}
     </div>
   );
 }

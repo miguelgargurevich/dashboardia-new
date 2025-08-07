@@ -76,6 +76,7 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
           />
           <select
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none transition-colors"
+            style={{ height: '42px' }}
             value={editData?.tipo || ""}
             onChange={e => setEditData({ ...editData, tipo: e.target.value })}
             required
