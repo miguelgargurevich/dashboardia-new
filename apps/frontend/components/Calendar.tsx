@@ -2,7 +2,11 @@ import { useMemo, useState } from "react";
 
 export default function Calendar({ events }: { events: any[] }) {
   // ...existing code...
-  const [selectedDate, setSelectedDate] = useState<string>("");
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
+  const [currentMonth, setCurrentMonth] = useState<number>(today.getMonth());
+  const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
   // Agrupa eventos por fecha (YYYY-MM-DD)
   const grouped = useMemo(() => {
     const map: Record<string, any[]> = {};
@@ -15,16 +19,13 @@ export default function Calendar({ events }: { events: any[] }) {
     return map;
   }, [events]);
 
-  // Genera los días del mes actual
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay();
+  // Genera los días del mes seleccionado
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
   const days: Array<{ day: number; date: string; events: any[] }> = [];
   for (let i = 1; i <= daysInMonth; i++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
     days.push({ day: i, date: dateStr, events: grouped[dateStr] || [] });
   }
 
@@ -41,7 +42,37 @@ export default function Calendar({ events }: { events: any[] }) {
     <div className="bg-white dark:bg-darkBg rounded-lg shadow p-4">
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-lg font-bold text-primary dark:text-accent">Calendario de eventos</h2>
-        <span className="text-sm text-gray-400">{today.toLocaleString("es", { month: "long", year: "numeric" })}</span>
+        <div className="flex items-center gap-2">
+          <button
+            className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700"
+            onClick={() => {
+              setCurrentMonth(m => m === 0 ? 11 : m - 1);
+              if (currentMonth === 0) setCurrentYear(y => y - 1);
+            }}
+          >{"<"}</button>
+          <span className="text-sm text-gray-400">{new Date(currentYear, currentMonth).toLocaleString("es", { month: "long", year: "numeric" })}</span>
+          <button
+            className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700"
+            onClick={() => {
+              setCurrentMonth(m => m === 11 ? 0 : m + 1);
+              if (currentMonth === 11) setCurrentYear(y => y + 1);
+            }}
+          >{">"}</button>
+          <button
+            className="ml-2 px-2 py-1 rounded bg-primary text-white border border-primary"
+            onClick={() => {
+              setCurrentMonth(today.getMonth());
+              setCurrentYear(today.getFullYear());
+              setSelectedDate(todayStr);
+            }}
+          >Hoy</button>
+        </div>
+      </div>
+      {/* Cabeceras de los días de la semana */}
+      <div className="grid grid-cols-7 gap-2 mb-2">
+        {["L", "M", "M", "J", "V", "S", "D"].map((d, i) => (
+          <div key={d + i} className="text-xs font-bold text-center text-gray-500 dark:text-gray-400">{d}</div>
+        ))}
       </div>
       <div className="grid grid-cols-7 gap-2">
         {[...Array(firstDay).keys()].map(i => <div key={"empty-"+i}></div>)}
@@ -53,16 +84,18 @@ export default function Calendar({ events }: { events: any[] }) {
               ${events.length > 0 ? "border-primary" : "border-gray-200 dark:border-gray-700"}`}
             onClick={() => setSelectedDate(date)}
           >
-            <span className="font-semibold">{day}</span>
-            {events.length > 0 && <span className="text-xs text-primary dark:text-accent">{events.length} evento(s)</span>}
+            <span className={`font-semibold ${selectedDate === date ? "text-white" : ""}`}>{day}</span>
+            {events.length > 0 && (
+              <span className={`text-xs ${selectedDate === date ? "text-white" : "text-primary dark:text-accent"}`}>{events.length} evento(s)</span>
+            )}
           </button>
         ))}
       </div>
       {/* Cards modernos para eventos del día seleccionado */}
       {selectedDate && grouped[selectedDate] && grouped[selectedDate].length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-1 gap-4 mt-4">
           {grouped[selectedDate].map((ev, idx) => (
-            <div key={ev.id ?? idx} className="bg-white dark:bg-darkBg rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800">
+            <div key={ev.id ?? idx} className="bg-white dark:bg-darkBg rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 w-full">
               <div className="flex items-center gap-2 mb-2">
                 <span className="px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mr-2">{ev.eventType}</span>
                 <span className="px-2 py-1 rounded text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">{ev.modo}</span>
