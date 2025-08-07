@@ -101,7 +101,7 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
   }
   if (!resource) return <div className="flex-1 flex items-center justify-center text-gray-400">Selecciona un recurso</div>;
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-8 bg-bg dark:bg-bg-dark rounded-lg shadow">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-accent flex items-center gap-2">
           {tipo && tipo.icono && (
@@ -198,7 +198,7 @@ export default function RecursosRoute() {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
+    <div className="flex h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <ResourceList resources={resources} selectedId={selectedId} onSelect={setSelectedId} tiposRecursos={tiposRecursos} onNew={handleNew} />
       <ResourceViewer
         resource={isCreating ? newResource : selectedResource}

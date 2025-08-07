@@ -223,7 +223,7 @@ export default function NotasRoute() {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
+    <div className="flex h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <NoteList notes={notes} selectedId={selectedId} onSelect={setSelectedId} tiposNotas={tiposNotas} onNew={handleNew} />
       <NoteViewer
         note={isCreating ? newNote : selectedNote}

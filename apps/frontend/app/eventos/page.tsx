@@ -235,7 +235,7 @@ export default function EventosPage() {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
+    <div className="flex h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <EventList events={events} selectedId={selectedId} onSelect={setSelectedId} tiposEventos={tiposEventos} onNew={handleNew} />
       <EventViewer
         event={isCreating ? newEvent : selectedEvent}

@@ -41,7 +41,7 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
   }
 
   return (
-    <div className="bg-white dark:bg-darkBg rounded-lg shadow p-4">
+    <div className="bg-bg dark:bg-bg-dark rounded-lg shadow p-4">
 
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
@@ -93,8 +93,8 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
           <button
             key={date}
             className={`border rounded h-16 w-full flex flex-col items-center justify-center cursor-pointer transition-all
-              ${selectedDate === date ? "bg-primary text-white" : "bg-white dark:bg-darkBg text-gray-700 dark:text-gray-200"}
-              ${events.length > 0 ? "border-primary" : "border-gray-200 dark:border-gray-700"}`}
+              ${selectedDate === date ? "bg-primary text-white" : "bg-bg dark:bg-bg-dark text-gray-700 dark:text-gray-200"}
+              ${events.length > 0 ? "border-primary" : "border-border dark:border-border-dark"}`}
             onClick={() => setSelectedDate(date)}
           >
             <span className={`font-semibold ${selectedDate === date ? "text-white" : ""}`}>{day}</span>
@@ -131,7 +131,7 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
               }
             }
             return (
-              <div key={ev.id ?? idx} className="bg-white dark:bg-darkBg rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-800 w-full">
+              <div key={ev.id ?? idx} className="bg-bg dark:bg-bg-dark rounded-xl shadow-lg p-6 border border-border dark:border-border-dark w-full">
                 <div className="flex items-center gap-2 mb-2">
                   <span
                     className="px-2 py-1 rounded flex items-center gap-1 text-xs font-semibold mr-2"
