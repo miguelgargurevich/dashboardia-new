@@ -41,6 +41,8 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew, s
 
 function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, onSave, onCancel, isCreating }: any) {
   const [editData, setEditData] = useState<any>(resource);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const safeTiposRecursos = Array.isArray(tiposRecursos) ? tiposRecursos : [];
   useEffect(() => {
     // Find tipo id if resource.tipo is nombre
@@ -62,7 +64,36 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
       <div className="flex-1 p-8">
         <form className="space-y-4 max-w-xl" onSubmit={async e => {
           e.preventDefault();
-          await onSave(editData);
+          let url = editData.url;
+          if (file) {
+            if (file.size > 10 * 1024 * 1024) {
+              alert('El archivo supera el límite de 10 MB');
+              return;
+            }
+            setUploading(true);
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+            const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
+            const res = await fetch(`${apiBase.replace(/\/$/, '')}/upload`, {
+              method: 'POST',
+              body: formData,
+            });
+              const result = await res.json();
+              if (!res.ok) {
+                alert('Error al subir el archivo: ' + (result.error || 'Error desconocido'));
+                setUploading(false);
+                return;
+              }
+              url = result.url;
+            } catch (err: any) {
+              alert('Error al subir el archivo: ' + err.message);
+              setUploading(false);
+              return;
+            }
+            setUploading(false);
+          }
+          await onSave({ ...editData, url });
         }}>
           <div className="flex items-center gap-2 mb-4">
             <input
@@ -102,7 +133,31 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
             value={editData?.url || ""}
             onChange={e => setEditData({ ...editData, url: e.target.value })}
             placeholder="URL o enlace (opcional)"
+            disabled={uploading}
           />
+          <div className="mb-2">
+            <label className="block font-semibold mb-2 text-gray-700 dark:text-gray-200">Adjuntar archivo <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(máx 10 MB)</span></label>
+            <div className="flex items-center gap-3">
+              <label className={`flex items-center px-4 py-2 border rounded-lg cursor-pointer transition-colors ${uploading ? 'opacity-60 cursor-not-allowed' : ''} ${file ? 'bg-primary/10 dark:bg-primary/20 border-primary dark:border-primary' : 'bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20'}`}
+                style={{ pointerEvents: uploading ? 'none' : 'auto' }}>
+                <FiFile className="text-xl text-primary mr-2" />
+                <span className={`text-sm font-medium ${file ? 'text-primary dark:text-primary' : 'text-gray-700 dark:text-gray-200'}`}>{file ? file.name : 'Selecciona archivo'}</span>
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={e => setFile(e.target.files?.[0] || null)}
+                  disabled={uploading}
+                />
+              </label>
+              {file && !uploading && (
+                <button type="button" className="ml-2 px-2 py-1 rounded bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 text-xs font-semibold" onClick={() => setFile(null)}>Quitar</button>
+              )}
+              {uploading && <span className="ml-2 text-primary flex items-center gap-1"><FiLink className="animate-spin" /> Subiendo archivo...</span>}
+            </div>
+            {file && !uploading && file.size > 10 * 1024 * 1024 && (
+              <div className="text-red-500 text-xs mt-1">El archivo supera el límite de 10 MB</div>
+            )}
+          </div>
           <div className="flex gap-2">
             <button type="submit" className="px-4 py-2 rounded bg-primary text-white font-bold hover:bg-primary/80">{isCreating ? "Crear" : "Guardar"}</button>
             <button type="button" className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold" onClick={onCancel}>Cancelar</button>

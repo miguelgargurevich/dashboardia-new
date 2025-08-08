@@ -6,7 +6,7 @@ const { prisma } = require('../prisma/client');
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+// app.use(express.json()); // Eliminar global para evitar conflicto con Multer
 
 // Rutas modulares
 
@@ -26,16 +26,18 @@ const assistantRouter = require('./routes/assistant');
 
 app.use('/api', indexRouter);
 app.use('/api/health', healthRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/notes', notesRouter);
-app.use('/api/resources', resourcesRouter);
-app.use('/api/events', eventsRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/tipo-evento', tipoEventoRouter);
-app.use('/api/tipo-nota', tipoNotaRouter);
-app.use('/api/tipo-recurso', tipoRecursoRouter);
-app.use('/api/upload', uploadRouter);
-app.use('/api/assistant', assistantRouter);
+
+// Aplica express.json() solo a rutas que lo necesitan
+app.use('/api/auth', express.json(), authRouter);
+app.use('/api/notes', express.json(), notesRouter);
+app.use('/api/resources', express.json(), resourcesRouter);
+app.use('/api/events', express.json(), eventsRouter);
+app.use('/api/users', express.json(), usersRouter);
+app.use('/api/tipo-evento', express.json(), tipoEventoRouter);
+app.use('/api/tipo-nota', express.json(), tipoNotaRouter);
+app.use('/api/tipo-recurso', express.json(), tipoRecursoRouter);
+app.use('/api/upload', uploadRouter); // Sin express.json()
+app.use('/api/assistant', express.json(), assistantRouter);
 
 const PORT = process.env.PORT_DEV || 4000;
 app.listen(PORT, () => {
