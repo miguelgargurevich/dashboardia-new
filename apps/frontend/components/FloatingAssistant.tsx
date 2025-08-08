@@ -44,63 +44,128 @@ const FloatingAssistant = () => {
     // await fetch('/api/recursos/upload', { method: 'POST', body: formData });
   };
 
+  // Estado para posición de la burbuja
+  const [bubblePos, setBubblePos] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const winW = window.innerWidth;
+      const winH = window.innerHeight;
+      setBubblePos({
+        x: winW - 80 - 24, // 80px burbuja aprox, 24px margen
+        y: winH - 80 - 24
+      });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragging) return;
+      setBubblePos(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
+    };
+    const handleMouseUp = () => setDragging(false);
+    if (dragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragging]);
+
+  const handleBubbleDragStart = (e: React.MouseEvent) => {
+    setDragging(true);
+    e.preventDefault();
+  };
+
+  // Determinar esquina para el panel según posición de la burbuja
+  let panelStyle: React.CSSProperties = { position: 'fixed', zIndex: 50 };
+  if (typeof window !== 'undefined') {
+    const winW = window.innerWidth;
+    const winH = window.innerHeight;
+    // Si la burbuja está en la mitad superior, panel arriba; si no, abajo
+    if (bubblePos.y < winH / 2) {
+      panelStyle.top = 24;
+    } else {
+      panelStyle.bottom = 24;
+    }
+    // Si la burbuja está en la mitad izquierda, panel izquierda; si no, derecha
+    if (bubblePos.x < winW / 2) {
+      panelStyle.left = 24;
+    } else {
+      panelStyle.right = 24;
+    }
+  } else {
+    panelStyle.right = 24;
+    panelStyle.bottom = 24;
+  }
+
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <>
       {!open && (
-        <button
-          className="bg-blue-600 text-white rounded-full shadow-lg p-4 hover:bg-blue-700 transition"
-          onClick={() => setOpen(true)}
+        <div
+          style={{ position: 'fixed', left: bubblePos.x, top: bubblePos.y, zIndex: 50, cursor: dragging ? 'grabbing' : 'grab' }}
+          onMouseDown={handleBubbleDragStart}
         >
-          <FaRobot size={28} />
-        </button>
+          <button
+            className="bg-blue-600 text-white rounded-full shadow-lg p-4 hover:bg-blue-700 transition"
+            onClick={e => { setOpen(true); e.stopPropagation(); }}
+          >
+            <FaRobot size={28} />
+          </button>
+        </div>
       )}
       {open && (
-        <div className="w-96 h-[32rem] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-800">
-          <div className="flex items-center justify-between p-4 border-b dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
-            <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2"><FaRobot /> Asistente</span>
-            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-red-500"><FaTimes /></button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {messages.map((msg, i) => (
-              <div key={i} className={msg.role === 'user' ? 'text-right' : 'text-left'}>
-                <div className={msg.role === 'user' ? 'inline-block bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 rounded-lg px-3 py-2' : 'inline-block bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2'}>
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+        <div style={panelStyle}>
+          <div className="w-96 h-[32rem] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-800">
+            <div className="flex items-center justify-between p-4 border-b dark:border-gray-800 bg-gray-50 dark:bg-gray-800 cursor-move select-none">
+              <span className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2"><FaRobot /> Asistente</span>
+              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-red-500"><FaTimes /></button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {messages.map((msg, i) => (
+                <div key={i} className={msg.role === 'user' ? 'text-right' : 'text-left'}>
+                  <div className={msg.role === 'user' ? 'inline-block bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 rounded-lg px-3 py-2' : 'inline-block bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2'}>
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
                 </div>
-              </div>
-            ))}
-            {loading && <div className="text-gray-400">Pensando...</div>}
-          </div>
-          <div className="p-4 border-t dark:border-gray-800 bg-gray-50 dark:bg-gray-800 flex gap-2">
-            <input
-              type="text"
-              className="flex-1 rounded-lg border px-3 py-2 dark:bg-gray-900 dark:text-white"
-              placeholder="Escribe tu pregunta o tarea..."
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' ? handleSend() : null}
-              disabled={loading}
-            />
-            <button onClick={handleSend} className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition" disabled={loading}>
-              <FaPaperPlane />
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              onChange={handleFileUpload}
-            />
-            <button
-              onClick={() => {
-                if (fileInputRef.current) fileInputRef.current.click();
-              }}
-              className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-            >
-              <FaFileUpload />
-            </button>
+              ))}
+              {loading && <div className="text-gray-400">Pensando...</div>}
+            </div>
+            <div className="p-4 border-t dark:border-gray-800 bg-gray-50 dark:bg-gray-800 flex gap-2">
+              <input
+                type="text"
+                className="flex-1 rounded-lg border px-3 py-2 dark:bg-gray-900 dark:text-white"
+                placeholder="Escribe tu pregunta o tarea..."
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' ? handleSend() : null}
+                disabled={loading}
+              />
+              <button onClick={handleSend} className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition" disabled={loading}>
+                <FaPaperPlane />
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileUpload}
+              />
+              <button
+                onClick={() => {
+                  if (fileInputRef.current) fileInputRef.current.click();
+                }}
+                className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+              >
+                <FaFileUpload />
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
