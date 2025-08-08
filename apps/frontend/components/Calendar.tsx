@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { FiAlertCircle, FiClock, FiFile, FiUserCheck, FiTag, FiMapPin } from "react-icons/fi";
+import { FaRegCalendarAlt } from "react-icons/fa";
 
 export default function Calendar({ events, tiposEventos }: { events: any[], tiposEventos?: any[] }) {
   // ...existing code...
@@ -89,23 +90,27 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
       </div>
       <div className="grid grid-cols-7 gap-2">
         {[...Array(firstDay).keys()].map(i => <div key={"empty-"+i}></div>)}
-        {days.map(({ day, date, events }) => (
-          <button
-            key={date}
-            className={`border rounded h-16 w-full flex flex-col items-center justify-center cursor-pointer transition-all
-              ${selectedDate === date ? "bg-primary text-white" : "bg-bg dark:bg-bg-dark text-gray-700 dark:text-gray-200"}
-              ${events.length > 0 ? "border-primary" : "border-border dark:border-border-dark"}`}
-            onClick={() => setSelectedDate(date)}
-          >
-            <span className={`font-semibold ${selectedDate === date ? "text-white" : ""}`}>{day}</span>
-            {events.length > 0 && (
-            <span className={`text-xs ${selectedDate === date ? "text-white" : "text-primary dark:text-primary"}`}>{events.length} evento(s)</span>
-            )}
-          </button>
-        ))}
+        {days.map(({ day, date, events }) => {
+          const isToday = date === todayStr;
+          return (
+            <button
+              key={date}
+              className={`border rounded h-16 w-full flex flex-col items-center justify-center cursor-pointer transition-all
+                ${selectedDate === date ? "bg-primary text-white" : "bg-bg dark:bg-bg-dark text-gray-700 dark:text-gray-200"}
+                ${events.length > 0 ? "border-primary" : "border-border dark:border-border-dark"}
+                ${isToday ? "border-indigo-500" : ""}`}
+              onClick={() => setSelectedDate(date)}
+            >
+              <span className={`font-semibold ${selectedDate === date ? "text-white" : ""}`}>{day}</span>
+              {events.length > 0 && (
+                <span className={`text-xs ${selectedDate === date ? "text-white" : "text-primary dark:text-primary"}`}>{events.length} evento(s)</span>
+              )}
+            </button>
+          );
+        })}
       </div>
       {/* Cards modernos para eventos del día seleccionado */}
-      {selectedDate && grouped[selectedDate] && grouped[selectedDate].length > 0 && (
+      {selectedDate && grouped[selectedDate] && grouped[selectedDate].length > 0 ? (
         <div className="grid grid-cols-1 gap-4 mt-10">
           {/* Cabecera de eventos del día */}
           <div className="mb-2">
@@ -156,8 +161,12 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-2 text-base">{ev.description}</p>
                 <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  <span className="flex items-center gap-1"><FiClock /> Inicio: {new Date(ev.startDate).toLocaleString()}</span>
-                  <span className="flex items-center gap-1"><FiClock /> Fin: {new Date(ev.endDate).toLocaleString()}</span>
+                  <span className="flex items-center gap-1">
+                    <FiClock /> Fecha: {(() => {
+                      const d = new Date(ev.startDate);
+                      return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth()+1).padStart(2, "0")}/${d.getFullYear()}`;
+                    })()}
+                  </span>
                   {ev.codigoDana && <span className="flex items-center gap-1"><FiFile /> Código Dana: {ev.codigoDana}</span>}
                 </div>
                 {/* Línea divisoria */}
@@ -178,6 +187,12 @@ export default function Calendar({ events, tiposEventos }: { events: any[], tipo
               </div>
             );
           })}
+        </div>
+      ) : (
+        <div className="text-center py-6">
+          {/* @ts-ignore */}
+          <FaRegCalendarAlt className="mx-auto text-3xl text-gray-600 mb-2" />
+          <p className="text-gray-400 text-sm">No hay eventos programados para este día</p>
         </div>
       )}
     </div>
