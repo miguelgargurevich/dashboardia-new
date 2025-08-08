@@ -47,6 +47,10 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
   const [editData, setEditData] = useState<any>(resource);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  // Reset file when resource, isEditing, or isCreating changes
+  useEffect(() => {
+    setFile(null);
+  }, [resource, isEditing, isCreating]);
   const safeTiposRecursos = Array.isArray(tiposRecursos) ? tiposRecursos : [];
   useEffect(() => {
     // Find tipo id if resource.tipo is nombre
