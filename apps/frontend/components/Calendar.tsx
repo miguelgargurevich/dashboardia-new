@@ -226,11 +226,14 @@ export default function Calendar({ events, tiposEventos, recursos }: { events: a
                 <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
                   <span className="flex items-center gap-1">
                     <FiClock /> Fecha: {(() => {
-                      const d = new Date(ev.startDate);
-                      return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth()+1).padStart(2, "0")}/${d.getFullYear()}`;
+                      if (!ev.startDate) return "";
+                      const [year, month, day] = ev.startDate.slice(0,10).split("-");
+                      return `${day}/${month}/${year}`;
                     })()}
                   </span>
                   {ev.codigoDana && <span className="flex items-center gap-1"><FiFile /> Código Dana: {ev.codigoDana}</span>}
+                  {ev.location && <span className="flex items-center gap-1"><FiMapPin /> Ubicación: {ev.location}</span>}
+
                 </div>
                 {/* Línea divisoria */}
                 <hr className="my-3 border-gray-200 dark:border-gray-700" />
@@ -247,9 +250,7 @@ export default function Calendar({ events, tiposEventos, recursos }: { events: a
                     <FiFile /> Recursos: {ev.relatedResources ? ev.relatedResources.length : 0}
                   </div>
                 </div>
-                <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400">
-                  {ev.location && <span className="flex items-center gap-1"><FiMapPin /> Ubicación: {ev.location}</span>}
-                </div>
+           
               </div>
             );
           })}

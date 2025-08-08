@@ -39,10 +39,8 @@ function EventList({ events, selectedId, onSelect, tiposEventos, onNew, search, 
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">{(() => {
                   if (!event.startDate) return "";
-                  const d = new Date(event.startDate);
-                  const day = String(d.getDate()).padStart(2, '0');
-                  const month = String(d.getMonth() + 1).padStart(2, '0');
-                  const year = d.getFullYear();
+                  // Forzar local date usando los componentes de la fecha ISO
+                  const [year, month, day] = event.startDate.slice(0,10).split("-");
                   return `${day}/${month}/${year}`;
                 })()}</div>
               </li>
@@ -77,7 +75,7 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
     // Asegurar que editData.relatedResources siempre sea un array
     const relatedResourcesArr = Array.isArray(editData?.relatedResources) ? editData.relatedResources : [];
     return (
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-8 overflow-y-auto">
         <form className="space-y-4 max-w-xl" onSubmit={async e => {
           e.preventDefault();
           await onSave(editData);
@@ -115,7 +113,6 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
               <option key={t.id} value={t.id}>{t.nombre}</option>
             ))}
           </select>
-          <label className="block font-semibold text-gray-700 dark:text-white mb-2">Fecha</label>
           <input
             type="date"
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
@@ -133,12 +130,45 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
           />
           {/* Campo oculto para endDate */}
           <input type="hidden" value={editData?.endDate || ""} />
+
+          {/* Campos adicionales */}
+          <input
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
+            value={editData?.location || ""}
+            onChange={e => setEditData({ ...editData, location: e.target.value })}
+            placeholder="Ubicación"
+          />
+          <input
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
+            value={editData?.modo || ""}
+            onChange={e => setEditData({ ...editData, modo: e.target.value })}
+            placeholder="Modo (ej: Presencial, Virtual)"
+          />
+          <input
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
+            value={editData?.validador || ""}
+            onChange={e => setEditData({ ...editData, validador: e.target.value })}
+            placeholder="Validador"
+          />
+          <input
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
+            value={editData?.codigoDana || ""}
+            onChange={e => setEditData({ ...editData, codigoDana: e.target.value })}
+            placeholder="Código Dana"
+          />
+          <input
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
+            value={editData?.diaEnvio || ""}
+            onChange={e => setEditData({ ...editData, diaEnvio: e.target.value })}
+            placeholder="Día de envío"
+          />
           <input
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
             value={editData?.recurrencePattern || ""}
             onChange={e => setEditData({ ...editData, recurrencePattern: e.target.value })}
             placeholder="Recurrencia (ej: Semanal, Mensual)"
           />
+
           <div>
             <label className="block font-semibold mb-2">Recursos relacionados</label>
             <div className="flex flex-wrap gap-2">
@@ -171,10 +201,8 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
   // Formatear fecha de inicio a dd/mm/yyyy
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
+    // Forzar local date usando los componentes de la fecha ISO
+    const [year, month, day] = dateStr.slice(0,10).split("-");
     return `${day}/${month}/${year}`;
   };
   return (
