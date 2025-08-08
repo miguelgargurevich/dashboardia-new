@@ -162,33 +162,34 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
           )}
         <span>{tipo ? tipo.nombre : note.tipo}</span>
       </div>
-      <div className="mb-4 text-gray-700 dark:text-gray-100">
-        <span className="font-semibold">Recursos relacionados:</span>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {note.relatedResources?.length > 0 ? note.relatedResources.map((r: string, i: number) => (
-            <span key={r + i} className="px-2 py-1 rounded flex items-center gap-1"
-              style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}>
-              {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-                ? <span className="text-lg">
-                    <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
-                      style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
-                  </span>
-                : tipo.color && tipo.color.startsWith('text-')
-                  ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
-                  : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
-              )}
-              {r}
-            </span>
-          )) : <span className="text-xs text-gray-400 dark:text-gray-400">Sin recursos</span>}
-        </div>
-      </div>
+     
       <div className="mb-4 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Tags:</span> {note.tags?.join(", ")}
       </div>
       <div className="mb-4 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Estado:</span> {note.status}
       </div>
-      {/* Prioridad field hidden as requested */}
+        {/* Prioridad field hidden as requested */}
+        <div className="mb-4 text-gray-700 dark:text-gray-100">
+          <span className="font-semibold">Recursos relacionados:</span>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {note.relatedResources?.length > 0 ? note.relatedResources.map((r: string, i: number) => (
+              <span key={r + i} className="px-2 py-1 rounded flex items-center gap-1"
+                style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}>
+                {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+                  ? <span className="text-lg">
+                      <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                        style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+                    </span>
+                  : tipo.color && tipo.color.startsWith('text-')
+                    ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+                    : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+                )}
+                {r}
+              </span>
+          )) : <span className="text-xs text-gray-400 dark:text-gray-400">Sin recursos</span>}
+        </div>
+      </div>
     </div>
   );
 }
@@ -234,6 +235,16 @@ export default function NotasRoute() {
       setNotes([...notes, created]);
       setSelectedId(created.id);
       setIsCreating(false);
+    } else if (isEditing && selectedNote) {
+      const res = await fetch(`${API_BASE}/notes/${selectedNote.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editData),
+      });
+      const updated = await res.json();
+      setNotes(notes.map((n: any) => n.id === updated.id ? updated : n));
+      setSelectedId(updated.id);
+      setIsEditing(false);
     }
   };
   const handleNew = () => {

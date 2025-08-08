@@ -209,8 +209,17 @@ export default function RecursosRoute() {
       setResources([...resources, created]);
       setSelectedId(created.id);
       setIsCreating(false);
+    } else if (isEditing && selectedResource) {
+      const res = await fetch(`${API_BASE}/resources/${selectedResource.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editData),
+      });
+      const updated = await res.json();
+      setResources(resources.map((r: any) => r.id === updated.id ? updated : r));
+      setSelectedId(updated.id);
+      setIsEditing(false);
     }
-    // Si está editando, aquí iría la lógica de actualización (PUT)
   };
   const handleDelete = async () => {
     if (!selectedResource) return;
