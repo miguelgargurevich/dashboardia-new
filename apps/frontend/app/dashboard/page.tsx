@@ -64,7 +64,7 @@ export default function DashboardPage() {
       <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="md:col-span-2">
-          <Calendar events={events} tiposEventos={tiposEventos} />
+          <Calendar events={events} tiposEventos={tiposEventos} recursos={resources} />
         </div>
         <div>
           <UpcomingEventsPanel events={events} tiposEventos={tiposEventos} />

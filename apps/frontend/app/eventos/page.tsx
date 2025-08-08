@@ -37,7 +37,14 @@ function EventList({ events, selectedId, onSelect, tiposEventos, onNew, search, 
                   )}
                   <span className="font-semibold text-primary dark:text-primary">{event.title}</span>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{tipo ? tipo.nombre : event.eventType}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{(() => {
+                  if (!event.startDate) return "";
+                  const d = new Date(event.startDate);
+                  const day = String(d.getDate()).padStart(2, '0');
+                  const month = String(d.getMonth() + 1).padStart(2, '0');
+                  const year = d.getFullYear();
+                  return `${day}/${month}/${year}`;
+                })()}</div>
               </li>
             );
           })}
@@ -108,7 +115,7 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
               <option key={t.id} value={t.id}>{t.nombre}</option>
             ))}
           </select>
-          <label className="block font-semibold mb-2">Fecha</label>
+          <label className="block font-semibold text-gray-700 dark:text-white mb-2">Fecha</label>
           <input
             type="date"
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"

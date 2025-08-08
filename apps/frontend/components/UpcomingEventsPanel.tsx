@@ -80,8 +80,12 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
                     )}
                     {/* Detalle del evento */}
                     <div className="mt-2 text-sm text-gray-700 dark:text-gray-200 space-y-1">
-                      <div><span className="font-semibold">Inicio:</span> {start.toLocaleString()}</div>
-                      <div><span className="font-semibold">Fin:</span> {ev.endDate ? new Date(ev.endDate).toLocaleString() : "-"}</div>
+                      <div><span className="font-semibold">Fecha:</span> {(() => {
+                        const day = String(start.getDate()).padStart(2, '0');
+                        const month = String(start.getMonth() + 1).padStart(2, '0');
+                        const year = start.getFullYear();
+                        return `${day}/${month}/${year}`;
+                      })()}</div>
                       {ev.location && <div><span className="font-semibold">Ubicación:</span> {ev.location}</div>}
                       {ev.codigoDana && <div><span className="font-semibold">Código Dana:</span> {ev.codigoDana}</div>}
                       {ev.description && <div className="mt-1"><span className="font-semibold">Descripción:</span> {ev.description}</div>}
