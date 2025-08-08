@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import MarkdownViewer from "../../components/MarkdownViewer";
 import { FiTag, FiEdit, FiTrash2, FiPlus, FiFile } from "react-icons/fi";
 import { getTiposNotas } from "../../config/tipos";
 
@@ -148,7 +149,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
           <button onClick={onDelete} className="p-2 rounded bg-red-500 text-white hover:bg-red-600"><FiTrash2 /></button>
         </div>
       </div>
-      <div className="mb-4 text-gray-700 dark:text-gray-100 whitespace-pre-line">{note.content}</div>
+      <MarkdownViewer content={note.content} />
       <div className="mb-4 flex items-center gap-2 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Tipo:</span>
           {tipo && tipo.icono && (tipo.icono.startsWith('fa-')

@@ -76,9 +76,18 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
           await onSave(editData);
         }}>
           <div className="flex items-center gap-2 mb-4">
-            <input
-              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-accent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 transition-colors"
-              value={editData?.title || ""}
+    useEffect(() => {
+        // Find eventType id if event.eventType is nombre
+        let eventTypeId = event?.eventType;
+        if (eventTypeId && safeTiposEventos.length) {
+            const foundTipo = safeTiposEventos.find(t => t.id === eventTypeId || (typeof eventTypeId === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === eventTypeId.toLowerCase()));
+            eventTypeId = foundTipo ? foundTipo.id : "";
+        }
+        setEditData({
+            ...event,
+            eventType: eventTypeId || "",
+            relatedResources: Array.isArray(event?.relatedResources) ? event.relatedResources : [],
+        });
               onChange={e => setEditData({ ...editData, title: e.target.value })}
               placeholder="Título"
               required
