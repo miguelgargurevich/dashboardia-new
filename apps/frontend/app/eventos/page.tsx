@@ -76,18 +76,9 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
           await onSave(editData);
         }}>
           <div className="flex items-center gap-2 mb-4">
-    useEffect(() => {
-        // Find eventType id if event.eventType is nombre
-        let eventTypeId = event?.eventType;
-        if (eventTypeId && safeTiposEventos.length) {
-            const foundTipo = safeTiposEventos.find(t => t.id === eventTypeId || (typeof eventTypeId === 'string' && typeof t.nombre === 'string' && t.nombre.toLowerCase() === eventTypeId.toLowerCase()));
-            eventTypeId = foundTipo ? foundTipo.id : "";
-        }
-        setEditData({
-            ...event,
-            eventType: eventTypeId || "",
-            relatedResources: Array.isArray(event?.relatedResources) ? event.relatedResources : [],
-        });
+            <input
+              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-accent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 transition-colors"
+              value={editData?.title || ""}
               onChange={e => setEditData({ ...editData, title: e.target.value })}
               placeholder="Título"
               required
@@ -117,6 +108,24 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
               <option key={t.id} value={t.id}>{t.nombre}</option>
             ))}
           </select>
+          <label className="block font-semibold mb-2">Fecha</label>
+          <input
+            type="date"
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
+            value={editData?.startDate ? editData.startDate.slice(0,10) : (isCreating ? new Date().toISOString().slice(0,10) : "")}
+            onChange={e => {
+              const start = e.target.value;
+              // Calcular endDate: mismo día, 1 hora después (mantener formato yyyy-mm-dd)
+              let end = "";
+              if (start) {
+                end = start;
+              }
+              setEditData({ ...editData, startDate: start, endDate: end });
+            }}
+            required
+          />
+          {/* Campo oculto para endDate */}
+          <input type="hidden" value={editData?.endDate || ""} />
           <input
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
             value={editData?.recurrencePattern || ""}
@@ -162,7 +171,7 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
     return `${day}/${month}/${year}`;
   };
   return (
-    <div className="flex-1 p-8" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
+    <div className="flex-1 p-8 overflow-y-auto" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-accent flex items-center gap-2">
           {tipo && tipo.icono && (
@@ -177,7 +186,7 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
           <button onClick={onDelete} className="p-2 rounded bg-red-500 text-white hover:bg-red-600"><FiTrash2 /></button>
         </div>
       </div>
-      <div className="mb-4 text-gray-700 dark:text-white whitespace-pre-line">{event.description}</div>
+      <div className="mb-4 text-gray-700 dark:text-gray-100 whitespace-pre-line">{event.description}</div>
       <div className="mb-4 flex items-center gap-2">
         <span className="font-semibold text-gray-700 dark:text-white">Tipo:</span>
         {tipo && tipo.icono && (
@@ -197,27 +206,79 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
         <span className="font-semibold text-gray-700 dark:text-white">Recurrencia:</span> <span className="text-gray-700 dark:text-white">{event.recurrencePattern}</span>
       </div>
       <div className="mb-4 text-gray-700 dark:text-gray-100">
-          <span className="font-semibold">Recursos relacionados:</span>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {event.relatedResources?.length > 0 ? event.relatedResources.map((r: string, i: number) => (
-              <span key={r + i} className="px-2 py-1 rounded flex items-center gap-1"
-                style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}>
-                {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-                  ? <span className="text-lg">
-                      <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
-                        style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
-                    </span>
-                  : tipo.color && tipo.color.startsWith('text-')
-                    ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
-                    : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
-                )}
-                {r}
-              </span>
-          )) : <span className="text-xs text-gray-400 dark:text-gray-400">Sin recursos</span>}
+        <span className="font-semibold">Recursos relacionados:</span>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {renderRelatedResources(event.relatedResources, tipo, recursos)}
         </div>
       </div>
     </div>
   );
+}
+
+// Type guard para recursos relacionados
+function isResourceObject(obj: any): obj is { url?: string; titulo?: string } {
+  return obj && typeof obj === 'object' && (typeof obj.url === 'string' || typeof obj.titulo === 'string');
+}
+
+// Renderizado seguro de recursos relacionados
+function renderRelatedResources(relatedResources: any[], tipo: any, recursos: any[]) {
+  if (!Array.isArray(relatedResources) || relatedResources.length === 0) {
+    return <span className="text-xs text-gray-400 dark:text-gray-400">Sin recursos</span>;
+  }
+  return relatedResources.map((r, i) => {
+    // Si es objeto recurso, mostrar título
+    if (isResourceObject(r)) {
+      return (
+        <a
+          key={r.url || r.titulo || i}
+          href={r.url || '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-2 py-1 rounded flex items-center gap-1 hover:underline"
+          style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}
+        >
+          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+            ? <span className="text-lg">
+                <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                  style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+              </span>
+            : tipo.color && tipo.color.startsWith('text-')
+              ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+              : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+          )}
+          {r.titulo || r.url}
+        </a>
+      );
+    }
+    // Si es string (ID), buscar en recursos
+    if (typeof r === 'string') {
+      const recurso = recursos && Array.isArray(recursos) ? recursos.find((x: any) => x.id === r) : null;
+      const titulo = recurso ? (recurso.titulo || recurso.nombre || recurso.url || r) : r;
+      const url = recurso?.url || '#';
+      return (
+        <a
+          key={r + i}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-2 py-1 rounded flex items-center gap-1 hover:underline"
+          style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}
+        >
+          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+            ? <span className="text-lg">
+                <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                  style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+              </span>
+            : tipo.color && tipo.color.startsWith('text-')
+              ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+              : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+          )}
+          {titulo}
+        </a>
+      );
+    }
+    return null;
+  });
 }
 
 export default function EventosPage() {
@@ -268,26 +329,81 @@ export default function EventosPage() {
   const handleEdit = () => setIsEditing(true);
   const handleCancel = () => { setIsEditing(false); setIsCreating(false); };
   const handleSave = async (editData: any) => {
+    // Sanitize payload: only send correct fields, avoid duplicates
+    const safeTiposEventos = Array.isArray(tiposEventos) ? tiposEventos : [];
+    // Buscar el nombre del tipo de evento (enum) para el payload
+    const tipoEventoObj = safeTiposEventos.find(t => t.id === editData.eventType || t.nombre === editData.eventType);
+    // Forzar mayúscula inicial para el enum
+    let eventTypeEnum = tipoEventoObj?.enum || tipoEventoObj?.nombre || editData.eventType || "";
+    if (eventTypeEnum) {
+      eventTypeEnum = eventTypeEnum.charAt(0).toUpperCase() + eventTypeEnum.slice(1);
+    }
+    // Fecha actual en formato yyyy-mm-dd
+    const todayStr = new Date().toISOString().slice(0,10);
+    const startDateStr = editData.startDate && editData.startDate.length === 10 ? editData.startDate : todayStr;
+    const endDateStr = editData.endDate && editData.endDate.length === 10 ? editData.endDate : startDateStr;
+    const payload = {
+      title: editData.title || "",
+      description: editData.description || "",
+      eventType: eventTypeEnum,
+      location: editData.location || "",
+      startDate: new Date(startDateStr + 'T00:00:00.000Z').toISOString(),
+      endDate: new Date(endDateStr + 'T01:00:00.000Z').toISOString(),
+      recurrencePattern: editData.recurrencePattern || "",
+      relatedResources: Array.isArray(editData.relatedResources)
+        ? editData.relatedResources.map((r: any) => typeof r === 'object' && r.id ? r.id : r)
+        : [],
+      // Add all possible required fields with default values
+      codigoDana: editData.codigoDana || "",
+      diaEnvio: editData.diaEnvio || "",
+      modo: editData.modo || "",
+      validador: editData.validador || "",
+    };
+    console.log("[handleSave] Payload:", payload);
     if (isCreating) {
-      const res = await fetch(`${API_BASE}/events`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
-      });
-      const created = await res.json();
-      setEvents([...events, created]);
-      setSelectedId(created.id);
-      setIsCreating(false);
+      try {
+        const res = await fetch(`${API_BASE}/events`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        console.log("[handleSave] Response status:", res.status);
+        const text = await res.text();
+        console.log("[handleSave] Response text:", text);
+        if (!res.ok) {
+          alert("Error al crear evento: " + text);
+          return;
+        }
+        const created = JSON.parse(text);
+        setEvents([...events, created]);
+        setSelectedId(created.id);
+        setIsCreating(false);
+      } catch (err) {
+        console.error("[handleSave] Error:", err);
+        alert("Error al crear evento: " + err);
+      }
     } else if (isEditing && selectedEvent) {
-      const res = await fetch(`${API_BASE}/events/${selectedEvent.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
-      });
-      const updated = await res.json();
-      setEvents(events.map(e => e.id === updated.id ? updated : e));
-      setSelectedId(updated.id);
-      setIsEditing(false);
+      try {
+        const res = await fetch(`${API_BASE}/events/${selectedEvent.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        console.log("[handleSave] Response status:", res.status);
+        const text = await res.text();
+        console.log("[handleSave] Response text:", text);
+        if (!res.ok) {
+          alert("Error al actualizar evento: " + text);
+          return;
+        }
+        const updated = JSON.parse(text);
+        setEvents(events.map(e => e.id === updated.id ? updated : e));
+        setSelectedId(updated.id);
+        setIsEditing(false);
+      } catch (err) {
+        console.error("[handleSave] Error:", err);
+        alert("Error al actualizar evento: " + err);
+      }
     }
   };
   const handleNew = () => {
@@ -345,6 +461,7 @@ export default function EventosPage() {
           search={search}
           onSearch={setSearch}
         />
+        {/* Inyectar recursos en renderRelatedResources para mostrar nombre/título */}
         <EventViewer
           event={isCreating ? newEvent : selectedEvent}
           onEdit={handleEdit}

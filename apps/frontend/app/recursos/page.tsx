@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { FiFile, FiEdit, FiTrash2, FiPlus, FiLink } from "react-icons/fi";
 import { getTiposRecursos } from "../../config/tipos";
@@ -14,7 +13,11 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew, s
         <button className="text-primary dark:text-primary flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus className="text-primary dark:text-primary" /> Nuevo</button>
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-        {(Array.isArray(resources) ? resources : []).map((resource: any) => {
+        {(Array.isArray(resources) ? [...resources].sort((a, b) => {
+          const dateA = new Date(a.fecha || a.createdAt || a.date || 0);
+          const dateB = new Date(b.fecha || b.createdAt || b.date || 0);
+          return dateB.getTime() - dateA.getTime();
+        }) : []).map((resource: any) => {
           const tipo = tiposRecursos.find((t: any) => t.id === resource.tipo || t.nombre === resource.tipo);
           // Extraer color hexadecimal
           let iconColor = tipo?.color || '';
@@ -40,6 +43,7 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew, s
 }
 
 function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, onSave, onCancel, isCreating }: any) {
+
   const [editData, setEditData] = useState<any>(resource);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -98,8 +102,8 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
           <div className="flex items-center gap-2 mb-4">
             <input
               className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-accent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
-              value={editData?.titulo || editData?.nombre || ""}
-              onChange={e => setEditData({ ...editData, titulo: e.target.value, nombre: e.target.value })}
+              value={editData?.titulo || ""}
+              onChange={e => setEditData({ ...editData, titulo: e.target.value })}
               placeholder="Título o nombre"
               required
             />
@@ -115,6 +119,12 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
             onChange={e => setEditData({ ...editData, descripcion: e.target.value })}
             rows={4}
             placeholder="Descripción"
+          />
+          <input
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500"
+            value={Array.isArray(editData?.tags) ? editData.tags.join(", ") : ""}
+            onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
+            placeholder="Tags (separados por coma)"
           />
           <select
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none transition-colors"
@@ -168,7 +178,7 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
   }
   if (!resource) return <div className="flex-1 flex items-center justify-center text-gray-400">Selecciona un recurso</div>;
   return (
-    <div className="flex-1 p-8 bg-bg dark:bg-bg-dark rounded-lg shadow" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
+    <div className="flex-1 p-8 bg-bg dark:bg-bg-dark rounded-lg shadow overflow-y-auto" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-primary flex items-center gap-2">
           {tipo && tipo.icono && (
@@ -183,7 +193,7 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
           <button onClick={onDelete} className="p-2 rounded bg-red-500 text-white hover:bg-red-600"><FiTrash2 /></button>
         </div>
       </div>
-      <div className="mb-4 text-gray-900 dark:text-gray-100 whitespace-pre-line">{resource.descripcion}</div>
+      <div className="mb-4 text-gray-700 dark:text-gray-100 whitespace-pre-line">{resource.descripcion}</div>
       <div className="mb-4 flex items-center gap-2">
         <span className="font-semibold text-gray-900 dark:text-gray-100">Tipo:</span>
         {tipo && tipo.icono && (
@@ -199,10 +209,71 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
       <div className="mb-4">
         <span className="font-semibold text-gray-900 dark:text-gray-100">URL:</span> {resource.url ? <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">{resource.url}</a> : <span className="text-gray-900 dark:text-gray-100">Sin enlace</span>}
       </div>
+      {/* Recursos relacionados section removed as requested */}
     </div>
   );
 }
-// ...existing code...
+
+// Type guard para recursos relacionados
+function isResourceObject(obj: any): obj is { url?: string; titulo?: string } {
+  return obj && typeof obj === 'object' && (typeof obj.url === 'string' || typeof obj.titulo === 'string');
+}
+
+// Renderizado seguro de recursos relacionados
+function renderRelatedResources(relatedResources: any[], tipo: any) {
+  if (!Array.isArray(relatedResources) || relatedResources.length === 0) {
+    return <span className="text-xs text-gray-400 dark:text-gray-400">Sin recursos</span>;
+  }
+  return relatedResources.map((r, i) => {
+    if (isResourceObject(r)) {
+      return (
+        <a
+          key={r.url || r.titulo || i}
+          href={r.url || '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-2 py-1 rounded flex items-center gap-1 hover:underline"
+          style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}
+        >
+          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+            ? <span className="text-lg">
+                <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                  style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+              </span>
+            : tipo.color && tipo.color.startsWith('text-')
+              ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+              : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+          )}
+          {r.titulo || r.url}
+        </a>
+      );
+    } else if (typeof r === 'string') {
+      return (
+        <a
+          key={r + i}
+          href={r}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-2 py-1 rounded flex items-center gap-1 hover:underline"
+          style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}
+        >
+          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+            ? <span className="text-lg">
+                <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                  style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+              </span>
+            : tipo.color && tipo.color.startsWith('text-')
+              ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+              : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+          )}
+          {r}
+        </a>
+      );
+    } else {
+      return null;
+    }
+  });
+}
 
 export default function RecursosRoute() {
 

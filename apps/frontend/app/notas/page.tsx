@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import MarkdownViewer from "../../components/MarkdownViewer";
 import { FiTag, FiEdit, FiTrash2, FiPlus, FiFile } from "react-icons/fi";
 import { getTiposNotas } from "../../config/tipos";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
+
 
 function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
   return (
@@ -14,7 +14,11 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
         <button className="text-primary dark:text-primary flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus className="text-primary dark:text-primary" /> Nueva</button>
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-        {(Array.isArray(notes) ? notes : []).map((note: any) => {
+        {(Array.isArray(notes) ? [...notes].sort((a, b) => {
+          const dateA = new Date(a.fecha || a.createdAt || a.date || 0);
+          const dateB = new Date(b.fecha || b.createdAt || b.date || 0);
+          return dateB.getTime() - dateA.getTime();
+        }) : []).map((note: any) => {
           const tipo = tiposNotas.find((t: any) => t.id === note.tipo || t.nombre === note.tipo);
           return (
             <li key={note.id}
@@ -135,7 +139,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
   // Colored left border for selected note type
   const borderStyle = tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {};
   return (
-    <div className="flex-1 p-8" style={borderStyle}>
+    <div className="flex-1 p-8 overflow-y-auto" style={borderStyle}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-primary dark:text-primary flex items-center gap-2">
           {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
@@ -149,7 +153,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
           <button onClick={onDelete} className="p-2 rounded bg-red-500 text-white hover:bg-red-600"><FiTrash2 /></button>
         </div>
       </div>
-      <MarkdownViewer content={note.content} />
+      <div className="mb-4 text-gray-700 dark:text-gray-100 whitespace-pre-line">{note.content}</div>
       <div className="mb-4 flex items-center gap-2 text-gray-700 dark:text-gray-100">
         <span className="font-semibold">Tipo:</span>
           {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
@@ -173,26 +177,95 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
         {/* Prioridad field hidden as requested */}
         <div className="mb-4 text-gray-700 dark:text-gray-100">
           <span className="font-semibold">Recursos relacionados:</span>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {note.relatedResources?.length > 0 ? note.relatedResources.map((r: string, i: number) => (
-              <span key={r + i} className="px-2 py-1 rounded flex items-center gap-1"
-                style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}>
-                {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
-                  ? <span className="text-lg">
-                      <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
-                        style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
-                    </span>
-                  : tipo.color && tipo.color.startsWith('text-')
-                    ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
-                    : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
-                )}
-                {r}
-              </span>
-          )) : <span className="text-xs text-gray-400 dark:text-gray-400">Sin recursos</span>}
+          <div className="flex flex-wrap gap-2 mt-2">
+            {renderRelatedResources(note.relatedResources, tipo, recursos)}
+          </div>
         </div>
-      </div>
     </div>
   );
+}
+
+
+// Type guard para recursos relacionados
+function isResourceObject(obj: any): obj is { url?: string; titulo?: string } {
+  return obj && typeof obj === 'object' && (typeof obj.url === 'string' || typeof obj.titulo === 'string');
+}
+
+// Renderizado seguro de recursos relacionados
+function renderRelatedResources(relatedResources: any[], tipo: any, recursos: any[]) {
+  if (!Array.isArray(relatedResources) || relatedResources.length === 0) {
+    return <span className="text-xs text-gray-400 dark:text-gray-400">Sin recursos</span>;
+  }
+  return relatedResources.map((r, i) => {
+    if (isResourceObject(r)) {
+      return (
+        <a
+          key={r.url || r.titulo || i}
+          href={r.url || '#'}
+          target={r.url ? "_blank" : undefined}
+          rel={r.url ? "noopener noreferrer" : undefined}
+          className="px-2 py-1 rounded flex items-center gap-1 hover:underline"
+          style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}
+        >
+          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+            ? <span className="text-lg">
+                <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                  style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+              </span>
+            : tipo.color && tipo.color.startsWith('text-')
+              ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+              : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+          )}
+          {r.titulo || r.url}
+        </a>
+      );
+    }
+    // Si es string (ID), buscar en recursos
+    if (typeof r === 'string') {
+      const recurso = recursos && Array.isArray(recursos) ? recursos.find((x: any) => x.id === r) : null;
+      const titulo = recurso ? (recurso.titulo || recurso.nombre || recurso.url || r) : r;
+      const url = recurso?.url || '';
+      return url && url !== '' ? (
+        <a
+          key={r + i}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-2 py-1 rounded flex items-center gap-1 hover:underline"
+          style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}
+        >
+          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+            ? <span className="text-lg">
+                <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                  style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+              </span>
+            : tipo.color && tipo.color.startsWith('text-')
+              ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+              : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+          )}
+          {titulo}
+        </a>
+      ) : (
+        <span
+          key={r + i}
+          className="px-2 py-1 rounded flex items-center gap-1"
+          style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}
+        >
+          {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
+            ? <span className="text-lg">
+                <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}
+                  style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}></i>
+              </span>
+            : tipo.color && tipo.color.startsWith('text-')
+              ? <span className={`text-lg ${tipo.color}`}>{tipo.icono}</span>
+              : <span className="text-lg" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+          )}
+          {titulo}
+        </span>
+      );
+    }
+    return null;
+  });
 }
 
 export default function NotasRoute() {
@@ -226,11 +299,21 @@ export default function NotasRoute() {
   const handleEdit = () => setIsEditing(true);
   const handleCancel = () => { setIsEditing(false); setIsCreating(false); };
   const handleSave = async (editData: any) => {
+    // Sanitize payload: only send correct fields, avoid duplicates
+    const payload = { ...editData };
+    // Only send 'title', not 'titulo'
+    if ('titulo' in payload) delete payload.titulo;
+    // Only send 'tipo', not 'tipoNota' or other variants
+    if ('tipoNota' in payload) delete payload.tipoNota;
+    // Ensure relatedResources is an array of resource IDs
+    if (Array.isArray(payload.relatedResources)) {
+      payload.relatedResources = payload.relatedResources.map((r: any) => typeof r === 'object' && r.id ? r.id : r);
+    }
     if (isCreating) {
       const res = await fetch(`${API_BASE}/notes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
+        body: JSON.stringify(payload),
       });
       const created = await res.json();
       setNotes([...notes, created]);
@@ -240,7 +323,7 @@ export default function NotasRoute() {
       const res = await fetch(`${API_BASE}/notes/${selectedNote.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
+        body: JSON.stringify(payload),
       });
       const updated = await res.json();
       setNotes(notes.map((n: any) => n.id === updated.id ? updated : n));
