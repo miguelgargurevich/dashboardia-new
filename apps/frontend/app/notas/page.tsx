@@ -301,8 +301,8 @@ function renderRelatedResources(relatedResources: any[], tipo: any, recursos: an
       ) : (
         <span
           key={r + i}
-          className="px-2 py-1 rounded flex items-center gap-1"
-          style={tipo?.color ? { border: `1px solid ${tipo.color}`, background: tipo.color + '22', color: tipo.color } : {}}
+          className={"px-2 py-1 rounded flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"}
+          style={tipo?.color ? { border: `1px solid ${tipo.color}` } : {}}
         >
           {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
             ? <span className="text-lg">
