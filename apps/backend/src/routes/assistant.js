@@ -77,34 +77,13 @@ async function generarContenidoConIA(params) {
     return cleanAIGeneratedText(aiResponse);
   } catch (error) {
     console.error('Error llamando a Gemini API:', error);
-    return generarContenidoFallback(params);
+    return 'Error: No se pudo obtener respuesta de la IA.';
   }
 
 }
 
 
-function generarContenidoFallback(params) {
-  const { titulo, descripcion, tipo, puntosClave } = params;
-  // Respuesta personalizada para saludos y preguntas simples
-  const rapida = respuestaRapida(titulo) || respuestaRapida(descripcion);
-  if (rapida) return rapida;
-
-  let contenido = `# ${titulo}\n\n`;
-  contenido += `**Tipo:** ${tipo}\n\n`;
-  contenido += `## Descripción\n\n${descripcion}\n\n`;
-  if (puntosClave && puntosClave.length > 0) {
-    contenido += `## Puntos Clave\n\n`;
-    puntosClave.forEach(punto => {
-      contenido += `- ${punto}\n`;
-    });
-    contenido += '\n';
-  }
-  contenido += `## Contenido\n\n`;
-  contenido += `_No tengo suficiente información para generar contenido útil en este momento. Si tienes una pregunta específica, ¡dímela!_\n\n`;
-  contenido += `---\n\n`;
-  contenido += `*Documento generado automáticamente - ${new Date().toLocaleDateString()}*`;
-  return contenido;
-}
+// Fallback eliminado: solo responde Gemini o error
 
 router.post('/', async (req, res) => {
   const { titulo, descripcion, tipo, puntosClave, etiquetas, contexto } = req.body;
