@@ -5,7 +5,13 @@ const { prisma } = require('../prisma/client');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://dashboardia-new-frontend.vercel.app',
+    'https://dashboardia-new.onrender.com'
+  ],
+  credentials: true
+}));
 // app.use(express.json()); // Eliminar global para evitar conflicto con Multer
 
 // Rutas modulares
