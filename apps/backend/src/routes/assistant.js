@@ -3,9 +3,24 @@ const router = express.Router();
 const { callGeminiAPI, GeminiConfigs, cleanAIGeneratedText } = require('../../lib/gemini');
 
 
+
+// Respuestas rápidas para saludos y preguntas simples
+function respuestaRapida(texto) {
+  const lower = (texto || '').toLowerCase();
+  if (lower.includes('hola') || lower.includes('buenas')) return '¡Hola! ¿En qué puedo ayudarte hoy?';
+  if (lower.includes('estás ahí') || lower.includes('estas ahi')) return 'Sí, estoy aquí para ayudarte 😊.';
+  if (lower.includes('que haces')) return 'Estoy listo para ayudarte con tus tareas o preguntas.';
+  if (lower.includes('ayuda')) return 'Puedes preguntarme cualquier cosa sobre documentación, procedimientos, notas, recursos, etc.';
+  return null;
+}
+
 // Función para generar contenido con IA
 async function generarContenidoConIA(params) {
   const { titulo, descripcion, tipo, puntosClave, etiquetas, contexto } = params;
+
+  // Respuesta rápida si la pregunta es simple
+  const rapida = respuestaRapida(titulo) || respuestaRapida(descripcion);
+  if (rapida) return rapida;
 
   function getGeminiConfigForContentType(tipo) {
     switch (tipo) {
@@ -70,6 +85,10 @@ async function generarContenidoConIA(params) {
 
 function generarContenidoFallback(params) {
   const { titulo, descripcion, tipo, puntosClave } = params;
+  // Respuesta personalizada para saludos y preguntas simples
+  const rapida = respuestaRapida(titulo) || respuestaRapida(descripcion);
+  if (rapida) return rapida;
+
   let contenido = `# ${titulo}\n\n`;
   contenido += `**Tipo:** ${tipo}\n\n`;
   contenido += `## Descripción\n\n${descripcion}\n\n`;
@@ -81,7 +100,7 @@ function generarContenidoFallback(params) {
     contenido += '\n';
   }
   contenido += `## Contenido\n\n`;
-  contenido += `_Este contenido será desarrollado próximamente._\n\n`;
+  contenido += `_No tengo suficiente información para generar contenido útil en este momento. Si tienes una pregunta específica, ¡dímela!_\n\n`;
   contenido += `---\n\n`;
   contenido += `*Documento generado automáticamente - ${new Date().toLocaleDateString()}*`;
   return contenido;
