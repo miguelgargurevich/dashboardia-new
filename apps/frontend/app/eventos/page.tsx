@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FiCalendar, FiEdit, FiTrash2, FiPlus, FiFile } from "react-icons/fi";
+import { FiCalendar, FiEdit, FiTrash2, FiPlus, FiFile, FiTag, FiSearch, FiMapPin } from "react-icons/fi";
 import { getTiposEventos, getRecursos } from "../../config/tipos";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
@@ -35,9 +35,9 @@ function EventList({ events, selectedId, onSelect, tiposEventos, onNew, search, 
                   {iconElement && (
                     <span className="text-xl">{iconElement}</span>
                   )}
-                  <span className="font-semibold text-primary dark:text-primary">{event.title}</span>
+                <span className="font-semibold text-gray-500 dark:text-gray-400">{event.title}</span>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{(() => {
+                <div className="text-xs text-gray-500 dark:text-gray-200">{(() => {
                   if (!event.startDate) return "";
                   // Forzar local date usando los componentes de la fecha ISO
                   const [year, month, day] = event.startDate.slice(0,10).split("-");
@@ -80,94 +80,139 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
           e.preventDefault();
           await onSave(editData);
         }}>
-          <div className="flex items-center gap-2 mb-4">
+          {/* Título con icono y borde igual que notas/recursos */}
+          <div className="relative mb-4">
             <input
-              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-accent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 transition-colors"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
               value={editData?.title || ""}
               onChange={e => setEditData({ ...editData, title: e.target.value })}
               placeholder="Título"
               required
             />
-            {tipo && tipo.icono && (
+            {/* Icono dinámico según tipo seleccionado */}
+            {tipo && tipo.icono ? (
               tipo.icono.startsWith('fa-')
-                ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
-                : <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
+                ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>
+                    <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}></i>
+                  </span>
+                : tipo.color && tipo.color.startsWith('text-')
+                  ? <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-2xl ${tipo.color}`}>{tipo.icono}</span>
+                  : <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+            ) : (
+              <FiEdit className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
             )}
           </div>
-          <textarea
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none placeholder-gray-400 dark:placeholder-gray-300 transition-colors"
-            value={editData?.description || ""}
-            onChange={e => setEditData({ ...editData, description: e.target.value })}
-            rows={4}
-            placeholder="Descripción"
-          />
-          <select
-            className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            style={{ height: '42px' }}
-            value={editData?.eventType || ""}
-            onChange={e => setEditData({ ...editData, eventType: e.target.value })}
-            required
-          >
-            <option value="">Tipo de evento</option>
-            {tiposEventos.map((t: any) => (
-              <option key={t.id} value={t.id}>{t.nombre}</option>
-            ))}
-          </select>
-          <input
-            type="date"
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
-            value={editData?.startDate ? editData.startDate.slice(0,10) : (isCreating ? new Date().toISOString().slice(0,10) : "")}
-            onChange={e => {
-              const start = e.target.value;
-              // Calcular endDate: mismo día, 1 hora después (mantener formato yyyy-mm-dd)
-              let end = "";
-              if (start) {
-                end = start;
-              }
-              setEditData({ ...editData, startDate: start, endDate: end });
-            }}
-            required
-          />
+          <div className="relative mb-4">
+            <textarea
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.description || ""}
+              onChange={e => setEditData({ ...editData, description: e.target.value })}
+              rows={4}
+              placeholder="Descripción"
+            />
+            <FiFile className="absolute left-3 top-4 text-accent" />
+          </div>
+          <div className="relative mb-4 w-64">
+            <select
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10 appearance-none"
+              style={{ height: '42px' }}
+              value={editData?.eventType || ""}
+              onChange={e => setEditData({ ...editData, eventType: e.target.value })}
+              required
+            >
+              <option value="">Tipo de evento</option>
+              {tiposEventos.map((t: any) => (
+                <option key={t.id} value={t.id}>{t.nombre}</option>
+              ))}
+            </select>
+            {/* Icono dinámico según tipo seleccionado */}
+            {tipo && tipo.icono ? (
+              tipo.icono.startsWith('fa-')
+                ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>
+                    <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}></i>
+                  </span>
+                : tipo.color && tipo.color.startsWith('text-')
+                  ? <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-xl ${tipo.color}`}>{tipo.icono}</span>
+                  : <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+            ) : (
+              <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+            )}
+          </div>
+          <div className="relative mb-4 w-64">
+            <input
+              type="date"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.startDate ? editData.startDate.slice(0,10) : (isCreating ? new Date().toISOString().slice(0,10) : "")}
+              onChange={e => {
+                const start = e.target.value;
+                let end = "";
+                if (start) {
+                  end = start;
+                }
+                setEditData({ ...editData, startDate: start, endDate: end });
+              }}
+              required
+            />
+            <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
           {/* Campo oculto para endDate */}
           <input type="hidden" value={editData?.endDate || ""} />
 
           {/* Campos adicionales */}
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
-            value={editData?.location || ""}
-            onChange={e => setEditData({ ...editData, location: e.target.value })}
-            placeholder="Ubicación"
-          />
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
-            value={editData?.modo || ""}
-            onChange={e => setEditData({ ...editData, modo: e.target.value })}
-            placeholder="Modo (ej: Presencial, Virtual)"
-          />
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
-            value={editData?.validador || ""}
-            onChange={e => setEditData({ ...editData, validador: e.target.value })}
-            placeholder="Validador"
-          />
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
-            value={editData?.codigoDana || ""}
-            onChange={e => setEditData({ ...editData, codigoDana: e.target.value })}
-            placeholder="Código Dana"
-          />
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
-            value={editData?.diaEnvio || ""}
-            onChange={e => setEditData({ ...editData, diaEnvio: e.target.value })}
-            placeholder="Día de envío"
-          />
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-300"
-            value={editData?.recurrencePattern || ""}
-            onChange={e => setEditData({ ...editData, recurrencePattern: e.target.value })}
-            placeholder="Recurrencia (ej: Semanal, Mensual)"
-          />
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.location || ""}
+              onChange={e => setEditData({ ...editData, location: e.target.value })}
+              placeholder="Ubicación"
+            />
+            <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.modo || ""}
+              onChange={e => setEditData({ ...editData, modo: e.target.value })}
+              placeholder="Modo (ej: Presencial, Virtual)"
+            />
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.validador || ""}
+              onChange={e => setEditData({ ...editData, validador: e.target.value })}
+              placeholder="Validador"
+            />
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.codigoDana || ""}
+              onChange={e => setEditData({ ...editData, codigoDana: e.target.value })}
+              placeholder="Código Dana"
+            />
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.diaEnvio || ""}
+              onChange={e => setEditData({ ...editData, diaEnvio: e.target.value })}
+              placeholder="Día de envío"
+            />
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.recurrencePattern || ""}
+              onChange={e => setEditData({ ...editData, recurrencePattern: e.target.value })}
+              placeholder="Recurrencia (ej: Semanal, Mensual)"
+            />
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
 
           <div>
             <label className="block font-semibold mb-2">Recursos relacionados</label>
@@ -208,7 +253,7 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
   return (
     <div className="flex-1 p-8 overflow-y-auto" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-primary dark:text-accent flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-400 flex items-center gap-2">
           {tipo && tipo.icono && (
             tipo.icono.startsWith('fa-')
               ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
@@ -452,23 +497,29 @@ export default function EventosPage() {
       <div className="w-full px-8 pt-4">
         <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Eventos</h1>
         <div className="flex gap-4 mb-4">
-          <input
-            type="text"
-            className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            placeholder="Buscar por título, descripción, tags..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          <select
-            className="px-3 py-2 rounded border bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            value={month}
-            onChange={e => setMonth(e.target.value)}
-          >
-            <option value="">Todos los meses</option>
-            {[...Array(12)].map((_, i) => (
-              <option key={i} value={String(i+1).padStart(2, '0')}>{new Date(2025, i).toLocaleString('es-ES', { month: 'long' })}</option>
-            ))}
-          </select>
+          <div className="relative w-64">
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              placeholder="Buscar por título, descripción, tags..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+          <div className="relative w-64">
+            <select
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none transition-colors pl-10 appearance-none"
+              value={month}
+              onChange={e => setMonth(e.target.value)}
+            >
+              <option value="">Todos los meses</option>
+              {[...Array(12)].map((_, i) => (
+                <option key={i} value={String(i+1).padStart(2, '0')}>{new Date(2025, i).toLocaleString('es-ES', { month: 'long' })}</option>
+              ))}
+            </select>
+            <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
         </div>
       </div>
       <div className="flex flex-1 min-h-0">

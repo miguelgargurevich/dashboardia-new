@@ -31,9 +31,9 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew, s
                     ? <span className="text-xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
                     : <span className="text-xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
                 )}
-                <span className="font-semibold text-primary dark:text-primary">{resource.titulo || resource.nombre}</span>
+                <span className="font-semibold text-gray-500 dark:text-gray-400">{resource.titulo || resource.nombre}</span>
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">{tipo ? tipo.nombre : resource.tipo}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-200">{tipo ? tipo.nombre : resource.tipo}</div>
             </li>
           );
         })}
@@ -106,7 +106,7 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
           {/* Título o nombre con icono y borde igual que notas */}
           <div className="relative mb-4">
             <input
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10 text-xl font-bold"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
               value={editData?.titulo || ""}
               onChange={e => setEditData({ ...editData, titulo: e.target.value })}
               placeholder="Título o nombre"
@@ -215,13 +215,13 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
   return (
     <div className="flex-1 p-8 bg-bg dark:bg-bg-dark rounded-lg shadow overflow-y-auto" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-primary dark:text-primary flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-400 flex items-center gap-2">
           {tipo && tipo.icono && (
             tipo.icono.startsWith('fa-')
               ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
               : <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
           )}
-          <span className="text-gray-900 dark:text-gray-100">{resource.titulo || resource.nombre}</span>
+          <span className="text-gray-500 dark:text-gray-400">{resource.titulo || resource.nombre}</span>
         </h2>
         <div className="flex gap-2">
           <button onClick={onEdit} className="p-2 rounded bg-primary text-white hover:bg-primary/80"><FiEdit /></button>

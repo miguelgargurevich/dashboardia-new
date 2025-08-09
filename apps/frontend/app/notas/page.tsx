@@ -35,9 +35,9 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
                     ? <span className={`text-xl ${tipo.color}`}>{tipo.icono}</span>
                     : <span className="text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
                 )}
-                <span className="font-semibold text-gray-800 dark:text-gray-400">{note.title}</span>
+                <span className="font-semibold text-gray-500 dark:text-gray-400">{note.title}</span>
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-100">{tipo ? tipo.nombre : note.tipo}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-200">{tipo ? tipo.nombre : note.tipo}</div>
             </li>
           );
         })}
