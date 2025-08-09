@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FiFile, FiEdit, FiTrash2, FiPlus, FiLink } from "react-icons/fi";
+import { FiFile, FiEdit, FiTrash2, FiPlus, FiLink, FiTag } from "react-icons/fi";
 import { getTiposRecursos } from "../../config/tipos";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
@@ -103,52 +103,83 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
           }
           await onSave({ ...editData, url });
         }}>
-          <div className="flex items-center gap-2 mb-4">
+          {/* Título o nombre con icono y borde igual que notas */}
+          <div className="relative mb-4">
             <input
-              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-accent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10 text-xl font-bold"
               value={editData?.titulo || ""}
               onChange={e => setEditData({ ...editData, titulo: e.target.value })}
               placeholder="Título o nombre"
               required
             />
-            {tipo && tipo.icono && (
+            {/* Icono dinámico según tipo seleccionado */}
+            {tipo && tipo.icono ? (
               tipo.icono.startsWith('fa-')
-                ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
-                : <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
+                ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>
+                    <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}></i>
+                  </span>
+                : tipo.color && tipo.color.startsWith('text-')
+                  ? <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-2xl ${tipo.color}`}>{tipo.icono}</span>
+                  : <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+            ) : (
+              <FiEdit className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
             )}
           </div>
-          <textarea
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
-            value={editData?.descripcion || ""}
-            onChange={e => setEditData({ ...editData, descripcion: e.target.value })}
-            rows={4}
-            placeholder="Descripción"
-          />
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500"
-            value={Array.isArray(editData?.tags) ? editData.tags.join(", ") : ""}
-            onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
-            placeholder="Tags (separados por coma)"
-          />
-          <select
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:outline-none transition-colors"
-            style={{ height: '42px' }}
-            value={editData?.tipo || ""}
-            onChange={e => setEditData({ ...editData, tipo: e.target.value })}
-            required
-          >
-            <option value="">Tipo de recurso</option>
-            {safeTiposRecursos.map((t: any) => (
-              <option key={t.id} value={t.id}>{t.nombre}</option>
-            ))}
-          </select>
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500"
-            value={editData?.url || ""}
-            onChange={e => setEditData({ ...editData, url: e.target.value })}
-            placeholder="URL o enlace (opcional)"
-            disabled={uploading}
-          />
+          <div className="relative mb-4">
+            <textarea
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.descripcion || ""}
+              onChange={e => setEditData({ ...editData, descripcion: e.target.value })}
+              rows={4}
+              placeholder="Descripción"
+            />
+            <FiFile className="absolute left-3 top-4 text-accent" />
+          </div>
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={Array.isArray(editData?.tags) ? editData.tags.join(", ") : ""}
+              onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
+              placeholder="Tags (separados por coma)"
+            />
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+          <div className="relative mb-4 w-64">
+            <select
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10 appearance-none"
+              style={{ height: '42px' }}
+              value={editData?.tipo || ""}
+              onChange={e => setEditData({ ...editData, tipo: e.target.value })}
+              required
+            >
+              <option value="">Tipo de recurso</option>
+              {safeTiposRecursos.map((t: any) => (
+                <option key={t.id} value={t.id}>{t.nombre}</option>
+              ))}
+            </select>
+            {/* Icono dinámico según tipo seleccionado */}
+            {tipo && tipo.icono ? (
+              tipo.icono.startsWith('fa-')
+                ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>
+                    <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}></i>
+                  </span>
+                : tipo.color && tipo.color.startsWith('text-')
+                  ? <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-xl ${tipo.color}`}>{tipo.icono}</span>
+                  : <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+            ) : (
+              <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+            )}
+          </div>
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.url || ""}
+              onChange={e => setEditData({ ...editData, url: e.target.value })}
+              placeholder="URL o enlace (opcional)"
+              disabled={uploading}
+            />
+            <FiLink className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
           <div className="mb-2">
             <label className="block font-semibold mb-2 text-gray-700 dark:text-gray-200">Adjuntar archivo <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(máx 10 MB)</span></label>
             <div className="flex items-center gap-3">
@@ -376,14 +407,15 @@ export default function RecursosRoute() {
     <div className="flex flex-col h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <div className="w-full px-8 pt-4">
         <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Recursos</h1>
-        <div className="mb-4">
+        <div className="mb-4 relative w-64">
           <input
             type="text"
-            className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
             placeholder="Buscar por título, descripción, tags..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
+          <FiFile className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
         </div>
       </div>
       <div className="flex h-[calc(100vh-120px)]">
