@@ -49,7 +49,7 @@ export default function AssistantWidget() {
       ) : (
         <button
           className="bg-primary text-white p-4 rounded-full shadow-lg hover:bg-secondary transition flex items-center gap-2"
-          onClick={() => setOpen(true)}
+          onClick={e => setOpen(true)}
         >
           <FaRobot />
         </button>
