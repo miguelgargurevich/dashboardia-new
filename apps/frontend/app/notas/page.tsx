@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FiTag, FiEdit, FiTrash2, FiPlus, FiFile } from "react-icons/fi";
+import { FiTag, FiEdit, FiTrash2, FiPlus, FiFile, FiSearch } from "react-icons/fi";
 import { getTiposNotas } from "../../config/tipos";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
@@ -35,9 +35,9 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
                     ? <span className={`text-xl ${tipo.color}`}>{tipo.icono}</span>
                     : <span className="text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
                 )}
-                <span className="font-semibold text-primary dark:text-primary">{note.title}</span>
+                <span className="font-semibold text-gray-800 dark:text-gray-400">{note.title}</span>
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">{tipo ? tipo.nombre : note.tipo}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-100">{tipo ? tipo.nombre : note.tipo}</div>
             </li>
           );
         })}
@@ -67,46 +67,99 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
           e.preventDefault();
           onSave(editData);
         }}>
-          <div className="flex items-center gap-2 mb-4">
+          {/* Título */}
+          <div className="relative mb-4">
             <input
-              className="text-2xl font-bold flex-1 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-accent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
               value={editData?.title || ""}
               onChange={e => setEditData({ ...editData, title: e.target.value })}
               placeholder="Título"
               required
             />
-            {tipo && tipo.icono && (
-              tipo.icono.startsWith('fa-')
-                ? <span className="text-2xl"><i className={`fa ${tipo.icono}`} style={iconColor ? { color: iconColor } : {}}></i></span>
-                : <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>
-            )}
+            {/* Icono dinámico según tipo seleccionado */}
+            {(() => {
+              const tipoSel = tiposNotas.find((t: any) => t.id === editData?.tipo || t.nombre === editData?.tipo);
+              if (tipoSel && tipoSel.icono) {
+                if (tipoSel.icono.startsWith('fa-')) {
+                  return (
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipoSel.color && tipoSel.color.startsWith('#') ? { color: tipoSel.color } : {}}>
+                      <i className={`fa ${tipoSel.icono} ${tipoSel.color && tipoSel.color.startsWith('text-') ? tipoSel.color : ''}`}></i>
+                    </span>
+                  );
+                } else if (tipoSel.color && tipoSel.color.startsWith('text-')) {
+                  return (
+                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-xl ${tipoSel.color}`}>{tipoSel.icono}</span>
+                  );
+                } else {
+                  return (
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipoSel.color && tipoSel.color.startsWith('#') ? { color: tipoSel.color } : {}}>{tipoSel.icono}</span>
+                  );
+                }
+              }
+              // Fallback: icono por defecto
+              return <FiEdit className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />;
+            })()}
           </div>
-          <textarea
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
-            value={editData?.content || ""}
-            onChange={e => setEditData({ ...editData, content: e.target.value })}
-            rows={5}
-            placeholder="Contenido"
-            required
-          />
-          <select
-            className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            style={{ height: '42px' }}
-            value={editData?.tipo || ""}
-            onChange={e => setEditData({ ...editData, tipo: e.target.value })}
-            required
-          >
-            <option value="">Tipo de nota</option>
-            {tiposNotas.map((t: any) => (
-              <option key={t.id} value={t.id}>{t.nombre}</option>
-            ))}
-          </select>
-          <input
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring text-gray-900 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-500"
-            value={editData?.tags?.join(", ") || ""}
-            onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
-            placeholder="Tags (separados por coma)"
-          />
+          {/* Contenido */}
+          <div className="relative mb-4">
+            <textarea
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.content || ""}
+              onChange={e => setEditData({ ...editData, content: e.target.value })}
+              rows={5}
+              placeholder="Contenido"
+              required
+            />
+            <FiFile className="absolute left-3 top-4 text-accent" />
+          </div>
+          {/* Tipo de nota */}
+          <div className="relative mb-4 w-64">
+            <select
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10 appearance-none"
+              style={{ height: '42px' }}
+              value={editData?.tipo || ""}
+              onChange={e => setEditData({ ...editData, tipo: e.target.value })}
+              required
+            >
+              <option value="">Tipo de nota</option>
+              {tiposNotas.map((t: any) => (
+                <option key={t.id} value={t.id}>{t.nombre}</option>
+              ))}
+            </select>
+            {/* Icono dinámico según tipo seleccionado */}
+            {(() => {
+              const tipoSel = tiposNotas.find((t: any) => t.id === editData?.tipo || t.nombre === editData?.tipo);
+              if (tipoSel && tipoSel.icono) {
+                if (tipoSel.icono.startsWith('fa-')) {
+                  return (
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipoSel.color && tipoSel.color.startsWith('#') ? { color: tipoSel.color } : {}}>
+                      <i className={`fa ${tipoSel.icono} ${tipoSel.color && tipoSel.color.startsWith('text-') ? tipoSel.color : ''}`}></i>
+                    </span>
+                  );
+                } else if (tipoSel.color && tipoSel.color.startsWith('text-')) {
+                  return (
+                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-xl ${tipoSel.color}`}>{tipoSel.icono}</span>
+                  );
+                } else {
+                  return (
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipoSel.color && tipoSel.color.startsWith('#') ? { color: tipoSel.color } : {}}>{tipoSel.icono}</span>
+                  );
+                }
+              }
+              // Fallback: icono por defecto
+              return <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />;
+            })()}
+          </div>
+          {/* Tags */}
+          <div className="relative mb-4">
+            <input
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              value={editData?.tags?.join(", ") || ""}
+              onChange={e => setEditData({ ...editData, tags: e.target.value.split(",").map((tag: string) => tag.trim()) })}
+              placeholder="Tags (separados por coma)"
+            />
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
           <div>
             <label className="block font-semibold mb-2">Recursos relacionados</label>
             <div className="flex flex-wrap gap-2">
@@ -141,7 +194,7 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
   return (
     <div className="flex-1 p-8 overflow-y-auto" style={borderStyle}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-primary dark:text-primary flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-400 flex items-center gap-2">
           {tipo && tipo.icono && (tipo.icono.startsWith('fa-')
             ? <span className="text-2xl" style={tipo.color ? { color: tipo.color } : {}}><i className={`fa ${tipo.icono}`}></i></span>
             : <span className="text-2xl" style={tipo.color ? { color: tipo.color } : {}}>{tipo.icono}</span>
@@ -350,15 +403,16 @@ export default function NotasRoute() {
     <div className="flex flex-col h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <div className="w-full px-8 pt-4">
         <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Notas</h1>
-        <div className="mb-4">
-          <input
-            type="text"
-            className="px-3 py-2 rounded border w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            placeholder="Buscar por título, contenido, tags..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
+      <div className="mb-4 relative w-64">
+        <input
+          type="text"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+          placeholder="Buscar por título, contenido, tags..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+      </div>
         <div className="flex h-[calc(100vh-120px)]">
           <NoteList
             notes={notes.filter(n => {

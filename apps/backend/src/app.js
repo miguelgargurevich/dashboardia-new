@@ -8,7 +8,8 @@ const app = express();
 app.use(cors({
   origin: [
     'https://dashboardia-new-frontend.vercel.app',
-    'https://dashboardia-new.onrender.com'
+    'https://dashboardia-new.onrender.com',
+    'http://localhost:3000'
   ],
   credentials: true
 }));
