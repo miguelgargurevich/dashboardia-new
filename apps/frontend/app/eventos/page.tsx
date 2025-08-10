@@ -552,8 +552,16 @@ export default function EventosPage() {
                 (Array.isArray(e.tags) ? e.tags.join(",").toLowerCase().includes(searchLower) : false);
               // Mostrar solo eventos del mes seleccionado
               const matchesMonth = month ? (e.startDate && e.startDate.slice(5,7) === month) : true;
-              // Filtrar por tipo si está seleccionado
-              const matchesTipo = tipoFiltro ? (e.eventType === tipoFiltro || (typeof e.eventType === 'string' && e.eventType.toLowerCase() === tipoFiltro.toLowerCase())) : true;
+              // Filtro robusto por tipo: compara id y nombre
+              const tipoObj = tiposEventos.find(t => t.id === e.eventType || t.nombre?.toLowerCase() === e.eventType?.toLowerCase());
+              const tipoId = tipoObj?.id || e.eventType;
+              const tipoNombre = tipoObj?.nombre?.toLowerCase() || e.eventType?.toLowerCase();
+              const filtroObj = tiposEventos.find(t => t.id === tipoFiltro || t.nombre?.toLowerCase() === tipoFiltro?.toLowerCase());
+              const filtroId = filtroObj?.id || tipoFiltro;
+              const filtroNombre = filtroObj?.nombre?.toLowerCase() || tipoFiltro?.toLowerCase();
+              const matchesTipo = tipoFiltro
+                ? (tipoId === filtroId || tipoNombre === filtroNombre)
+                : true;
               return matchesSearch && matchesMonth && matchesTipo;
             })
             .sort((a, b) => {

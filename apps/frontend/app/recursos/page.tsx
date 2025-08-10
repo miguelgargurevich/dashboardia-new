@@ -465,7 +465,16 @@ export default function RecursosRoute() {
               (r.titulo || r.nombre)?.toLowerCase().includes(searchLower) ||
               r.descripcion?.toLowerCase().includes(searchLower) ||
               (Array.isArray(r.tags) ? r.tags.join(",").toLowerCase().includes(searchLower) : false);
-            const matchesTipo = tipoFiltro ? (r.tipo === tipoFiltro || (typeof r.tipo === 'string' && r.tipo.toLowerCase() === tipoFiltro.toLowerCase())) : true;
+            // Filtro robusto por tipo: compara id y nombre
+            const tipoObj = tiposRecursos.find(t => t.id === r.tipo || t.nombre?.toLowerCase() === r.tipo?.toLowerCase());
+            const tipoId = tipoObj?.id || r.tipo;
+            const tipoNombre = tipoObj?.nombre?.toLowerCase() || r.tipo?.toLowerCase();
+            const filtroObj = tiposRecursos.find(t => t.id === tipoFiltro || t.nombre?.toLowerCase() === tipoFiltro?.toLowerCase());
+            const filtroId = filtroObj?.id || tipoFiltro;
+            const filtroNombre = filtroObj?.nombre?.toLowerCase() || tipoFiltro?.toLowerCase();
+            const matchesTipo = tipoFiltro
+              ? (tipoId === filtroId || tipoNombre === filtroNombre)
+              : true;
             return matchesSearch && matchesTipo;
           })}
           selectedId={selectedId}

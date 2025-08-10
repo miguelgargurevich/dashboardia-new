@@ -448,7 +448,16 @@ export default function NotasRoute() {
                 n.title?.toLowerCase().includes(searchLower) ||
                 n.content?.toLowerCase().includes(searchLower) ||
                 (Array.isArray(n.tags) ? n.tags.join(",").toLowerCase().includes(searchLower) : false);
-              const matchesTipo = tipoFiltro ? (n.tipo === tipoFiltro || (typeof n.tipo === 'string' && n.tipo.toLowerCase() === tipoFiltro.toLowerCase())) : true;
+              // Filtro robusto por tipo: compara id y nombre
+              const tipoObj = tiposNotas.find(t => t.id === n.tipo || t.nombre?.toLowerCase() === n.tipo?.toLowerCase());
+              const tipoId = tipoObj?.id || n.tipo;
+              const tipoNombre = tipoObj?.nombre?.toLowerCase() || n.tipo?.toLowerCase();
+              const filtroObj = tiposNotas.find(t => t.id === tipoFiltro || t.nombre?.toLowerCase() === tipoFiltro?.toLowerCase());
+              const filtroId = filtroObj?.id || tipoFiltro;
+              const filtroNombre = filtroObj?.nombre?.toLowerCase() || tipoFiltro?.toLowerCase();
+              const matchesTipo = tipoFiltro
+                ? (tipoId === filtroId || tipoNombre === filtroNombre)
+                : true;
               return matchesSearch && matchesTipo;
             })}
             selectedId={selectedId}
