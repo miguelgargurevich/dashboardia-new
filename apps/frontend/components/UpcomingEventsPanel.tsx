@@ -57,7 +57,12 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
                   }}
                 >
                   {iconElement}
-                  <span className={`font-bold text-base text-primary dark:text-primary truncate max-w-xs`}>{ev.title}</span>
+                  <span
+                    className={`font-bold text-base truncate max-w-xs`}
+                    style={iconColor ? { color: iconColor } : {}}
+                  >
+                    {ev.title}
+                  </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto whitespace-nowrap">{start.toLocaleDateString()}</span>
                   {isAlert && (
                     <span className="flex items-center gap-1 ml-2">
