@@ -109,11 +109,16 @@ export default function Calendar({ events, tiposEventos, recursos }: { events: a
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
           <FiCalendar className="text-2xl text-primary dark:text-primary mr-2" />
-          <h2 className="text-xl font-bold text-primary dark:text-primary">Calendario de eventos</h2>
+          <h2 className="text-xl font-bold text-primary dark:text-primary">
+            {(() => {
+              const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+              return meses[currentMonth] + " " + currentYear;
+            })()}
+          </h2>
         </div>
         <div className="flex items-center gap-2">
           <button
-            className="px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-primary/10 transition-colors"
+            className="px-2 py-1 rounded-md text-primary dark:text-primary font-normal bg-transparent border-none shadow-none hover:bg-transparent focus:outline-none"
             onClick={() => {
               setCurrentMonth(m => m === 0 ? 11 : m - 1);
               if (currentMonth === 0) setCurrentYear(y => y - 1);
@@ -123,17 +128,17 @@ export default function Calendar({ events, tiposEventos, recursos }: { events: a
             <FiChevronLeft className="text-lg" />
           </button>
           <button
-            className="px-4 py-1 rounded-md bg-primary text-white border border-primary flex items-center gap-2 shadow hover:bg-primary/90 font-semibold transition-colors"
+            className="px-2 py-1 rounded-md text-primary dark:text-primary font-normal bg-transparent border-none shadow-none hover:bg-transparent focus:outline-none"
             onClick={() => {
               setCurrentMonth(today.getMonth());
               setCurrentYear(today.getFullYear());
               setSelectedDate(todayStr);
             }}
           >
-            <FiCalendar className="text-base" /> Hoy
+            Hoy
           </button>
           <button
-            className="px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:bg-primary/10 transition-colors"
+            className="px-2 py-1 rounded-md text-primary dark:text-primary font-normal bg-transparent border-none shadow-none hover:bg-transparent focus:outline-none"
             onClick={() => {
               setCurrentMonth(m => m === 11 ? 0 : m + 1);
               if (currentMonth === 11) setCurrentYear(y => y + 1);
