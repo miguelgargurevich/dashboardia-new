@@ -34,12 +34,12 @@ async function main() {
   }
   // Tipos de Eventos
   const tiposEventos = [
-    { nombre: 'capacitacion', icono: 'fa-graduation-cap', color: '#22c55e' },
-    { nombre: 'reunion', icono: 'fa-users', color: '#facc15' },
-    { nombre: 'incidente', icono: 'fa-exclamation-triangle', color: '#ef4444' },
-    { nombre: 'mantenimiento', icono: 'fa-tools', color: '#3b82f6' },
-    { nombre: 'notificaciones', icono: 'fa-bell', color: '#6366f1' },
-    { nombre: 'otro', icono: 'fa-calendar-alt', color: '#6b7280' }
+    { nombre: 'Capacitacion', icono: 'fa-graduation-cap', color: '#22c55e' },
+    { nombre: 'Reunion', icono: 'fa-users', color: '#facc15' },
+    { nombre: 'Incidente', icono: 'fa-exclamation-triangle', color: '#ef4444' },
+    { nombre: 'Mantenimiento', icono: 'fa-tools', color: '#3b82f6' },
+    { nombre: 'Notificaciones', icono: 'fa-bell', color: '#6366f1' },
+    { nombre: 'Otro', icono: 'fa-calendar-alt', color: '#6b7280' }
   ];
   for (const t of tiposEventos) {
     const exists = await prisma.tipoEvento.findUnique({ where: { nombre: t.nombre } });
@@ -257,7 +257,10 @@ async function main() {
   ];
   for (const e of businessEvents) {
     let resourceIds = [];
-    if (e.relatedResources && e.relatedResources.length > 0) {
+    // Si el evento es de tipo 'notificaciones', no asignar recursos relacionados
+    if (e.eventType && e.eventType.toLowerCase() === 'notificaciones') {
+      resourceIds = [];
+    } else if (e.relatedResources && e.relatedResources.length > 0) {
       for (const res of e.relatedResources) {
         let resourceData = {};
         if (res.startsWith('http')) {
@@ -297,24 +300,14 @@ async function main() {
       if (day > daysInMonth) day = daysInMonth;
       const startDate = new Date(year, mes, day, 9, 0, 0);
       const endDate = new Date(year, mes, day, 10, 0, 0);
-      const eventData = {
+      let eventData = {
         ...e,
         startDate,
         endDate,
-        relatedResources: resourceIds
+        relatedResources: resourceIds,
+        eventType: 'Notificaciones'
       };
       delete eventData.recurrentDay;
-      // Adaptar eventType al enum
-      if (eventData.eventType) {
-        switch (eventData.eventType.toLowerCase()) {
-          case 'reunion': eventData.eventType = 'Reunion'; break;
-          case 'capacitacion': eventData.eventType = 'Capacitacion'; break;
-          case 'mantenimiento': eventData.eventType = 'Mantenimiento'; break;
-          case 'incidente': eventData.eventType = 'Incidente'; break;
-          case 'notificaciones': eventData.eventType = 'Notificaciones'; break;
-          case 'otro': eventData.eventType = 'Otro'; break;
-        }
-      }
       await prisma.event.create({ data: eventData });
     }
   }

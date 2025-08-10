@@ -384,6 +384,7 @@ export default function EventosPage() {
   const [search, setSearch] = useState("");
   const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
   const [month, setMonth] = useState(currentMonth);
+  const [tipoFiltro, setTipoFiltro] = useState("");
 
   useEffect(() => {
     fetch(`${API_BASE}/events`)
@@ -500,7 +501,7 @@ export default function EventosPage() {
   return (
     <div className="flex flex-col h-screen min-h-0 bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <div className="w-full px-8 pt-4">
-        <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Eventos</h1>
+        <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Gestión de Eventos</h1>
         <div className="flex gap-4 mb-4">
           <div className="relative w-64">
             <input
@@ -525,6 +526,19 @@ export default function EventosPage() {
             </select>
             <FiCalendar className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
           </div>
+          <div className="relative w-64">
+            <select
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none transition-colors pl-10 appearance-none"
+              value={tipoFiltro || ""}
+              onChange={e => setTipoFiltro(e.target.value)}
+            >
+              <option value="">Todos los tipos</option>
+              {tiposEventos.map((t: any) => (
+                <option key={t.id} value={t.id}>{t.nombre}</option>
+              ))}
+            </select>
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
         </div>
       </div>
       <div className="flex flex-1 min-h-0">
@@ -538,7 +552,9 @@ export default function EventosPage() {
                 (Array.isArray(e.tags) ? e.tags.join(",").toLowerCase().includes(searchLower) : false);
               // Mostrar solo eventos del mes seleccionado
               const matchesMonth = month ? (e.startDate && e.startDate.slice(5,7) === month) : true;
-              return matchesSearch && matchesMonth;
+              // Filtrar por tipo si está seleccionado
+              const matchesTipo = tipoFiltro ? (e.eventType === tipoFiltro || (typeof e.eventType === 'string' && e.eventType.toLowerCase() === tipoFiltro.toLowerCase())) : true;
+              return matchesSearch && matchesMonth && matchesTipo;
             })
             .sort((a, b) => {
               if (!a.startDate || !b.startDate) return 0;

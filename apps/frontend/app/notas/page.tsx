@@ -325,6 +325,7 @@ function renderRelatedResources(relatedResources: any[], tipo: any, recursos: an
 }
 
 export default function NotasRoute() {
+  const [tipoFiltro, setTipoFiltro] = useState("");
   const [notes, setNotes] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedNote, setSelectedNote] = useState<any>(null);
@@ -413,26 +414,42 @@ export default function NotasRoute() {
   return (
     <div className="flex flex-col h-screen bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <div className="w-full px-8 pt-4">
-        <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Notas</h1>
-      <div className="mb-4 relative w-64">
-        <input
-          type="text"
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
-          placeholder="Buscar por título, contenido, tags..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
-      </div>
+        <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Gestión de Notas</h1>
+        <div className="flex gap-4 mb-4">
+          <div className="relative w-64">
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+              placeholder="Buscar por título, contenido, tags..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+          <div className="relative w-64">
+            <select
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none transition-colors pl-10 appearance-none"
+              value={tipoFiltro || ""}
+              onChange={e => setTipoFiltro(e.target.value)}
+            >
+              <option value="">Todos los tipos</option>
+              {tiposNotas.map((t: any) => (
+                <option key={t.id} value={t.id}>{t.nombre}</option>
+              ))}
+            </select>
+            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          </div>
+        </div>
         <div className="flex h-[calc(100vh-120px)]">
           <NoteList
             notes={notes.filter(n => {
               const searchLower = search.toLowerCase();
-              return (
+              const matchesSearch =
                 n.title?.toLowerCase().includes(searchLower) ||
                 n.content?.toLowerCase().includes(searchLower) ||
-                (Array.isArray(n.tags) ? n.tags.join(",").toLowerCase().includes(searchLower) : false)
-              );
+                (Array.isArray(n.tags) ? n.tags.join(",").toLowerCase().includes(searchLower) : false);
+              const matchesTipo = tipoFiltro ? (n.tipo === tipoFiltro || (typeof n.tipo === 'string' && n.tipo.toLowerCase() === tipoFiltro.toLowerCase())) : true;
+              return matchesSearch && matchesTipo;
             })}
             selectedId={selectedId}
             onSelect={setSelectedId}
