@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FiFile, FiEdit, FiTrash2, FiPlus, FiLink, FiTag } from "react-icons/fi";
+import { FiFile, FiEdit, FiTrash2, FiPlus, FiLink, FiTag, FiSearch } from "react-icons/fi";
 import { getTiposRecursos } from "../../config/tipos";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
@@ -391,13 +391,22 @@ export default function RecursosRoute() {
     }
   };
   const handleNew = () => {
-    setNewResource({ titulo: "", descripcion: "", tipo: "", tags: [], url: "" });
+    // Buscar el tipo 'Enlaces Web' en tiposRecursos
+    const tipoEnlace = tiposRecursos.find((t: any) => t.nombre?.toLowerCase() === "enlaces web");
+    setNewResource({
+      titulo: "",
+      descripcion: "",
+      tipo: tipoEnlace ? tipoEnlace.id : "Enlaces Web",
+      tags: [],
+      url: ""
+    });
     setSelectedId(null);
     setIsCreating(true);
   };
 
-  // Custom onSelect handler to exit edit/create mode when selecting from the list
+  // Igual que en notas/eventos: no cambiar de recurso si está en modo edición o creación
   const handleSelect = (id: string) => {
+    if (isEditing || isCreating) return;
     setSelectedId(id);
     setIsEditing(false);
     setIsCreating(false);
@@ -415,7 +424,7 @@ export default function RecursosRoute() {
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-          <FiFile className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
         </div>
       </div>
       <div className="flex h-[calc(100vh-120px)]">

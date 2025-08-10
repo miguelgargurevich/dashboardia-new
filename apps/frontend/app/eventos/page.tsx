@@ -215,13 +215,16 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">Recursos relacionados</label>
+            <label className="block font-semibold mb-2 text-gray-700 dark:text-gray-200">Recursos relacionados</label>
             <div className="flex flex-wrap gap-2">
               {recursos.map((r: any) => (
                 <button
                   type="button"
                   key={r.id}
-                  className={`px-2 py-1 rounded border flex items-center gap-1 ${relatedResourcesArr.includes(r.id) ? "bg-primary text-white" : "bg-gray-100"}`}
+                  className={`px-2 py-1 rounded border flex items-center gap-1 transition-colors duration-150
+                    ${relatedResourcesArr.includes(r.id)
+                      ? "bg-primary text-white border-primary shadow"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"}`}
                   onClick={() => setEditData({
                     ...editData,
                     relatedResources: relatedResourcesArr.includes(r.id)
@@ -286,7 +289,7 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
         <span className="font-semibold text-gray-700 dark:text-white">Recurrencia:</span> <span className="text-gray-700 dark:text-white">{event.recurrencePattern}</span>
       </div>
       <div className="mb-4 text-gray-700 dark:text-gray-100">
-        <span className="font-semibold">Recursos relacionados:</span>
+        <span className="font-semibold text-gray-700 dark:text-gray-200">Recursos relacionados:</span>
         <div className="flex flex-wrap gap-2 mt-2">
           {renderRelatedResources(event.relatedResources, tipo, recursos)}
         </div>
@@ -487,7 +490,9 @@ export default function EventosPage() {
     }
   };
   const handleNew = () => {
-    setNewEvent({ title: "", description: "", eventType: "", location: "", startDate: "", endDate: "", recurrencePattern: "", relatedResources: [] });
+    // Buscar el tipo 'notificaciones' en tiposEventos y usar su id
+    const tipoNotif = tiposEventos.find((t: any) => t.nombre?.toLowerCase().includes("notificacion"));
+    setNewEvent({ title: "", description: "", eventType: tipoNotif ? tipoNotif.id : "notificaciones", location: "", startDate: "", endDate: "", recurrencePattern: "", relatedResources: [] });
     setSelectedId(null);
     setIsCreating(true);
   };

@@ -161,13 +161,16 @@ function NoteViewer({ note, onEdit, onDelete, tiposNotas, isEditing, onSave, onC
             <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
           </div>
           <div>
-            <label className="block font-semibold mb-2">Recursos relacionados</label>
+            <label className="block font-semibold mb-2 text-gray-700 dark:text-gray-200">Recursos relacionados</label>
             <div className="flex flex-wrap gap-2">
-              {recursos && recursos.map((r: any) => (
+              {recursos.map((r: any) => (
                 <button
                   type="button"
                   key={r.id}
-                  className={`px-2 py-1 rounded border flex items-center gap-1 ${relatedResourcesArr.includes(r.id) ? "bg-primary text-white" : "bg-gray-100"}`}
+                  className={`px-2 py-1 rounded border flex items-center gap-1 transition-colors duration-150
+                    ${relatedResourcesArr.includes(r.id)
+                      ? "bg-primary text-white border-primary shadow"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"}`}
                   onClick={() => setEditData({
                     ...editData,
                     relatedResources: relatedResourcesArr.includes(r.id)
@@ -329,7 +332,7 @@ export default function NotasRoute() {
   const [recursos, setRecursos] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [newNote, setNewNote] = useState<any>({ title: "", content: "", tipo: "", tags: [], relatedResources: [] });
+  const [newNote, setNewNote] = useState<any>({ title: "", content: "", tipo: "Nota", tags: [], relatedResources: [] });
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -385,7 +388,15 @@ export default function NotasRoute() {
     }
   };
   const handleNew = () => {
-    setNewNote({ title: "", content: "", tipo: "", tags: [] });
+    // Buscar el tipo 'Nota' en tiposNotas
+    const tipoNota = tiposNotas.find((t: any) => t.nombre?.toLowerCase() === "nota");
+    setNewNote({
+      title: "",
+      content: "",
+      tipo: tipoNota ? tipoNota.id : "Nota",
+      tags: [],
+      relatedResources: []
+    });
     setSelectedId(null);
     setIsCreating(true);
   };
