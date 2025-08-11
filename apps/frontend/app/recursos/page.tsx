@@ -9,7 +9,7 @@ function ResourceList({ resources, selectedId, onSelect, tiposRecursos, onNew, s
   return (
     <div className="w-1/3 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto pl-8">
       <div className="flex items-center justify-between px-4 py-2 border-b dark:border-gray-700">
-        <h2 className="text-lg font-bold text-primary dark:text-primary">Recursos</h2>
+        <span className="text-xs font-normal divide-gray-100 dark:divide-gray-600">Listado de recursos</span>
         <button className="text-primary dark:text-primary flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus className="text-primary dark:text-primary" /> Nuevo</button>
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -129,12 +129,12 @@ function ResourceViewer({ resource, onEdit, onDelete, tiposRecursos, isEditing, 
             {/* Icono dinámico según tipo seleccionado */}
             {tipo && tipo.icono ? (
               tipo.icono.startsWith('fa-')
-                ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>
+                ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>
                     <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}></i>
                   </span>
                 : tipo.color && tipo.color.startsWith('text-')
-                  ? <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-2xl ${tipo.color}`}>{tipo.icono}</span>
-                  : <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+                  ? <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-xl ${tipo.color}`}>{tipo.icono}</span>
+                  : <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
             ) : (
               <FiEdit className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
             )}

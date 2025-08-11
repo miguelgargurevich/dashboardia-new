@@ -9,7 +9,7 @@ function EventList({ events, selectedId, onSelect, tiposEventos, onNew, search, 
   return (
     <div className="w-1/3 border-r border-gray-200 dark:border-gray-800 h-full min-h-0 flex flex-col pl-8">
       <div className="flex items-center justify-between px-4 py-2 border-b dark:border-gray-700">
-        <h2 className="text-lg font-bold text-primary dark:text-primary">Eventos</h2>
+        <span className="text-xs font-normal divide-gray-100 dark:divide-gray-600">Listado de eventos</span>
         <button className="text-primary dark:text-primary flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus className="text-primary dark:text-primary" /> Nuevo</button>
       </div>
       <div className="flex-1 overflow-y-auto">
@@ -74,6 +74,10 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
   if (isEditing || isCreating) {
     // Asegurar que editData.relatedResources siempre sea un array
     const relatedResourcesArr = Array.isArray(editData?.relatedResources) ? editData.relatedResources : [];
+    const isNotificacion = tipo && (
+      (tipo.nombre && tipo.nombre.toLowerCase().includes('notificacion')) ||
+      (tipo.id && tipo.id.toString().toLowerCase().includes('notificacion'))
+    );
     return (
       <div className="flex-1 p-8 overflow-y-auto">
         <form className="space-y-4 max-w-xl" onSubmit={async e => {
@@ -92,12 +96,12 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
             {/* Icono dinámico según tipo seleccionado */}
             {tipo && tipo.icono ? (
               tipo.icono.startsWith('fa-')
-                ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>
+                ? <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>
                     <i className={`fa ${tipo.icono} ${tipo.color && tipo.color.startsWith('text-') ? tipo.color : ''}`}></i>
                   </span>
                 : tipo.color && tipo.color.startsWith('text-')
-                  ? <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-2xl ${tipo.color}`}>{tipo.icono}</span>
-                  : <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
+                  ? <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-xl ${tipo.color}`}>{tipo.icono}</span>
+                  : <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl" style={tipo.color && tipo.color.startsWith('#') ? { color: tipo.color } : {}}>{tipo.icono}</span>
             ) : (
               <FiEdit className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
             )}
@@ -158,62 +162,70 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
           {/* Campo oculto para endDate */}
           <input type="hidden" value={editData?.endDate || ""} />
 
-          {/* Campos adicionales */}
-          <div className="relative mb-4">
-            <input
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
-              value={editData?.location || ""}
-              onChange={e => setEditData({ ...editData, location: e.target.value })}
-              placeholder="Ubicación"
-            />
-            <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
-          </div>
-          <div className="relative mb-4">
-            <input
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
-              value={editData?.modo || ""}
-              onChange={e => setEditData({ ...editData, modo: e.target.value })}
-              placeholder="Modo (ej: Presencial, Virtual)"
-            />
-            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
-          </div>
-          <div className="relative mb-4">
-            <input
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
-              value={editData?.validador || ""}
-              onChange={e => setEditData({ ...editData, validador: e.target.value })}
-              placeholder="Validador"
-            />
-            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
-          </div>
-          <div className="relative mb-4">
-            <input
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
-              value={editData?.codigoDana || ""}
-              onChange={e => setEditData({ ...editData, codigoDana: e.target.value })}
-              placeholder="Código Dana"
-            />
-            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
-          </div>
-          <div className="relative mb-4">
-            <input
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
-              value={editData?.diaEnvio || ""}
-              onChange={e => setEditData({ ...editData, diaEnvio: e.target.value })}
-              placeholder="Día de envío"
-            />
-            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
-          </div>
-          <div className="relative mb-4">
-            <input
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
-              value={editData?.recurrencePattern || ""}
-              onChange={e => setEditData({ ...editData, recurrencePattern: e.target.value })}
-              placeholder="Recurrencia (ej: Semanal, Mensual)"
-            />
-            <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
-          </div>
-
+          {/* Mostrar solo ubicación y modo si NO es notificación */}
+          {!isNotificacion && (
+            <>
+              <div className="relative mb-4">
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+                  value={editData?.location || ""}
+                  onChange={e => setEditData({ ...editData, location: e.target.value })}
+                  placeholder="Ubicación"
+                />
+                <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+              </div>
+              <div className="relative mb-4">
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+                  value={editData?.modo || ""}
+                  onChange={e => setEditData({ ...editData, modo: e.target.value })}
+                  placeholder="Modo (ej: Presencial, Virtual)"
+                />
+                <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+              </div>
+            </>
+          )}
+          {/* Mostrar solo los campos opcionales si es notificación */}
+          {isNotificacion && (
+            <>
+              <div className="relative mb-4">
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+                  value={editData?.validador || ""}
+                  onChange={e => setEditData({ ...editData, validador: e.target.value })}
+                  placeholder="Validador"
+                />
+                <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+              </div>
+              <div className="relative mb-4">
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+                  value={editData?.codigoDana || ""}
+                  onChange={e => setEditData({ ...editData, codigoDana: e.target.value })}
+                  placeholder="Código Dana"
+                />
+                <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+              </div>
+              <div className="relative mb-4">
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+                  value={editData?.diaEnvio || ""}
+                  onChange={e => setEditData({ ...editData, diaEnvio: e.target.value })}
+                  placeholder="Día de envío"
+                />
+                <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+              </div>
+              <div className="relative mb-4">
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-primary focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-colors pl-10"
+                  value={editData?.recurrencePattern || ""}
+                  onChange={e => setEditData({ ...editData, recurrencePattern: e.target.value })}
+                  placeholder="Recurrencia (ej: Semanal, Mensual)"
+                />
+                <FiTag className="absolute left-3 top-1/2 -translate-y-1/2 text-accent" />
+              </div>
+            </>
+          )}
           <div>
             <label className="block font-semibold mb-2 text-gray-700 dark:text-gray-200">Recursos relacionados</label>
             <div className="flex flex-wrap gap-2">
@@ -253,6 +265,11 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
     const [year, month, day] = dateStr.slice(0,10).split("-");
     return `${day}/${month}/${year}`;
   };
+  // Detectar si el tipo es Notificaciones
+  const isNotificacion = tipo && (
+    (tipo.nombre && tipo.nombre.toLowerCase().includes('notificacion')) ||
+    (tipo.id && tipo.id.toString().toLowerCase().includes('notificacion'))
+  );
   return (
     <div className="flex-1 p-8 overflow-y-auto" style={tipo?.color && tipo.color.startsWith('#') ? { borderLeft: `6px solid ${tipo.color}` } : {}}>
       <div className="flex items-center justify-between mb-4">
@@ -279,14 +296,36 @@ function EventViewer({ event, onEdit, onDelete, tiposEventos, recursos, isEditin
         )}
         <span className="text-gray-700 dark:text-white">{tipo ? tipo.nombre : event.eventType}</span>
       </div>
-      <div className="mb-4">
-        <span className="font-semibold text-gray-700 dark:text-white">Ubicación:</span> <span className="text-gray-700 dark:text-white">{event.location}</span>
-      </div>
+      {/* Mostrar solo ubicación y modo si NO es notificación */}
+      {!isNotificacion && (
+        <>
+          <div className="mb-4">
+            <span className="font-semibold text-gray-700 dark:text-white">Ubicación:</span> <span className="text-gray-700 dark:text-white">{event.location}</span>
+          </div>
+          <div className="mb-4">
+            <span className="font-semibold text-gray-700 dark:text-white">Modo:</span> <span className="text-gray-700 dark:text-white">{event.modo}</span>
+          </div>
+        </>
+      )}
+      {/* Mostrar solo los campos opcionales si es notificación */}
+      {isNotificacion && (
+        <>
+          <div className="mb-4">
+            <span className="font-semibold text-gray-700 dark:text-white">Validador:</span> <span className="text-gray-700 dark:text-white">{event.validador}</span>
+          </div>
+          <div className="mb-4">
+            <span className="font-semibold text-gray-700 dark:text-white">Código Dana:</span> <span className="text-gray-700 dark:text-white">{event.codigoDana}</span>
+          </div>
+          <div className="mb-4">
+            <span className="font-semibold text-gray-700 dark:text-white">Día de envío:</span> <span className="text-gray-700 dark:text-white">{event.diaEnvio}</span>
+          </div>
+          <div className="mb-4">
+            <span className="font-semibold text-gray-700 dark:text-white">Recurrencia:</span> <span className="text-gray-700 dark:text-white">{event.recurrencePattern}</span>
+          </div>
+        </>
+      )}
       <div className="mb-4">
         <span className="font-semibold text-gray-700 dark:text-white">Fecha:</span> <span className="text-gray-700 dark:text-white">{formatDate(event.startDate)}</span>
-      </div>
-      <div className="mb-4">
-        <span className="font-semibold text-gray-700 dark:text-white">Recurrencia:</span> <span className="text-gray-700 dark:text-white">{event.recurrencePattern}</span>
       </div>
       <div className="mb-4 text-gray-700 dark:text-gray-100">
         <span className="font-semibold text-gray-700 dark:text-gray-200">Recursos relacionados:</span>

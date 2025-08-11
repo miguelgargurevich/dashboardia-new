@@ -10,7 +10,7 @@ function NoteList({ notes, selectedId, onSelect, tiposNotas, onNew }: any) {
   return (
     <div className="w-1/3 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto">
       <div className="flex items-center justify-between px-4 py-2 border-b dark:border-gray-700">
-        <h2 className="text-lg font-bold text-primary dark:text-primary">Notas</h2>
+        <span className="text-xs font-normal divide-gray-100 dark:divide-gray-600">Listado de notas</span>
         <button className="text-primary dark:text-primary flex items-center gap-1 font-semibold" onClick={onNew}><FiPlus className="text-primary dark:text-primary" /> Nueva</button>
       </div>
       <ul className="divide-y divide-gray-100 dark:divide-gray-800">

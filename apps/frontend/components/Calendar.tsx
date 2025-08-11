@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { FiAlertCircle, FiClock, FiFile, FiUserCheck, FiTag, FiMapPin } from "react-icons/fi";
+import { FiAlertCircle, FiClock, FiFile, FiUserCheck, FiTag, FiMapPin, FiPaperclip } from "react-icons/fi";
 import { FaRegCalendarAlt } from "react-icons/fa";
 
 export default function Calendar({ events, tiposEventos, recursos }: { events: any[], tiposEventos?: any[], recursos?: any[] }) {
@@ -107,7 +107,7 @@ export default function Calendar({ events, tiposEventos, recursos }: { events: a
     <div className="bg-bg dark:bg-bg-dark rounded-lg shadow p-4">
 
       <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2">
           <FiCalendar className="text-2xl text-primary dark:text-primary mr-2" />
           <h2 className="text-xl font-bold text-primary dark:text-primary">
             {(() => {
@@ -149,8 +149,10 @@ export default function Calendar({ events, tiposEventos, recursos }: { events: a
           </button>
         </div>
       </div>
+      {/* Espacio extra entre cabecera y días de la semana */}
+      <div className="h-4" />
       {/* Cabeceras de los días de la semana */}
-      <div className="grid grid-cols-7 gap-2 mb-2">
+      <div className="grid grid-cols-7 gap-2 mb-4">
         {["L", "M", "M", "J", "V", "S", "D"].map((d, i) => (
           <div key={d + i} className="text-xs font-bold text-center text-gray-500 dark:text-gray-400">{d}</div>
         ))}
@@ -252,7 +254,7 @@ export default function Calendar({ events, tiposEventos, recursos }: { events: a
                     )}
                   </div>
                   <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 ml-4 flex items-center gap-1">
-                    <FiFile /> Recursos: {ev.relatedResources ? ev.relatedResources.length : 0}
+                    <FiPaperclip /> {ev.relatedResources ? ev.relatedResources.length : 0}
                   </div>
                 </div>
            
