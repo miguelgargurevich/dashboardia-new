@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 
 async function main() {
   await prisma.event.deleteMany({});
-  await prisma.resource.deleteMany({});
+  // await prisma.resource.deleteMany({}); // No eliminar recursos existentes
   await prisma.note.deleteMany({});
   const now = new Date();
   // Usuarios
@@ -36,8 +36,6 @@ async function main() {
   const tiposEventos = [
     { nombre: 'Capacitacion', icono: 'fa-graduation-cap', color: '#22c55e' },
     { nombre: 'Reunion', icono: 'fa-users', color: '#facc15' },
-    { nombre: 'Incidente', icono: 'fa-exclamation-triangle', color: '#ef4444' },
-    { nombre: 'Mantenimiento', icono: 'fa-tools', color: '#3b82f6' },
     { nombre: 'Notificaciones', icono: 'fa-bell', color: '#6366f1' },
     { nombre: 'Otro', icono: 'fa-calendar-alt', color: '#6b7280' }
   ];
@@ -97,6 +95,7 @@ async function main() {
     }
   }
   // Eventos de negocio
+  // Eventos de negocio (limpiados sin campos inexistentes)
   const businessEvents = [
     {
       validador: "Jose Arce",
@@ -107,7 +106,7 @@ async function main() {
       title: "Validar si se cae - Jose Arce",
       description: "Validar si se cae - Jose Arce - INCLUSION ACUMULADA (CLIENTE)",
       location: "",
-      eventType: "mantenimiento",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 7
     },
@@ -120,7 +119,7 @@ async function main() {
       title: "Validar si se cae - Jose Arce",
       description: "Validar si se cae - Jose Arce - INCLUSION ACUMULADA (BROKER)",
       location: "",
-      eventType: "mantenimiento",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 6
     },
@@ -133,7 +132,7 @@ async function main() {
       title: "Jose Arce",
       description: "VG Cobranzas Borker  - 20.06 5pm",
       location: "",
-      eventType: "incidente",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 20
     },
@@ -146,7 +145,7 @@ async function main() {
       title: "Jose Arce",
       description: "VG Cobranzas Cliente - 19.06 5pm",
       location: "",
-      eventType: "incidente",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 19
     },
@@ -159,7 +158,7 @@ async function main() {
       title: "Notificación Poliza Suspendiad 1º Envio",
       description: "Notificación Poliza Suspendiad 1º Envio",
       location: "",
-      eventType: "incidente",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 2
     },
@@ -172,7 +171,7 @@ async function main() {
       title: "Notificación Poliza Suspendiad 2º Envio",
       description: "Notificación Poliza Suspendiad 2º Envio",
       location: "",
-      eventType: "incidente",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 21
     },
@@ -185,7 +184,7 @@ async function main() {
       title: "Posible suspension de Cobertura",
       description: "Posible suspension de Cobertura",
       location: "",
-      eventType: "incidente",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 22
     },
@@ -198,7 +197,7 @@ async function main() {
       title: "Mailling",
       description: "Mailling",
       location: "",
-      eventType: "otro",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 2
     },
@@ -211,7 +210,7 @@ async function main() {
       title: "WSM Mailing Liquidaciones Pendiendtes de pago",
       description: "WSM Mailing Liquidaciones Pendiendtes de pago",
       location: "",
-      eventType: "otro",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 22
     },
@@ -224,7 +223,7 @@ async function main() {
       title: "LIQUIDACIONES WSM",
       description: "LIQUIDACIONES WSM",
       location: "",
-      eventType: "otro",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 7
     },
@@ -237,7 +236,7 @@ async function main() {
       title: "Vida Ley ex empleados",
       description: "Vida Ley ex empleados",
       location: "",
-      eventType: "incidente",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 9
     },
@@ -250,49 +249,12 @@ async function main() {
       title: "Reportes integrales de agencia",
       description: "Reportes integrales de agencia",
       location: "",
-      eventType: "otro",
+      eventType: "Notificaciones",
       recurrencePattern: "mensual",
       recurrentDay: 1
     }
   ];
   for (const e of businessEvents) {
-    let resourceIds = [];
-    // Si el evento es de tipo 'notificaciones', no asignar recursos relacionados
-    if (e.eventType && e.eventType.toLowerCase() === 'notificaciones') {
-      resourceIds = [];
-    } else if (e.relatedResources && e.relatedResources.length > 0) {
-      for (const res of e.relatedResources) {
-        let resourceData = {};
-        if (res.startsWith('http')) {
-          resourceData = {
-            tipo: 'Enlaces Web',
-            titulo: res,
-            url: res,
-            fechaCarga: now
-          };
-        } else {
-          resourceData = {
-            tipo: 'Archivos',
-            titulo: res,
-            filePath: res,
-            fechaCarga: now
-          };
-        }
-        let existing = null;
-        if (resourceData.url) {
-          existing = await prisma.resource.findFirst({ where: { url: resourceData.url } });
-        } else if (resourceData.filePath) {
-          existing = await prisma.resource.findFirst({ where: { filePath: resourceData.filePath } });
-        }
-        let resource;
-        if (!existing) {
-          resource = await prisma.resource.create({ data: resourceData });
-        } else {
-          resource = existing;
-        }
-        resourceIds.push(resource.id);
-      }
-    }
     for (let mes = 0; mes < 12; mes++) {
       const year = now.getFullYear();
       let day = e.recurrentDay;
@@ -304,8 +266,8 @@ async function main() {
         ...e,
         startDate,
         endDate,
-        relatedResources: resourceIds,
-        eventType: 'Notificaciones'
+        relatedResources: [],
+        eventType: e.eventType
       };
       delete eventData.recurrentDay;
       await prisma.event.create({ data: eventData });
