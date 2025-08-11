@@ -56,6 +56,11 @@ export default function Login() {
         {/* Izquierda: Formulario de login/registro */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-[#181c23]">
           <div className="w-full max-w-sm bg-[#181c23] rounded-2xl shadow-2xl p-8 border border-white/10">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 flex items-center justify-center rounded-full bg-primary text-white text-4xl font-extrabold shadow focus:outline-none focus:ring-2 focus:ring-primary" style={{ fontFamily: 'Inter, sans-serif' }}>
+                D
+              </div>
+            </div>
             <h2 className="text-3xl font-bold mb-6 text-[#bfc8e6] text-center font-poppins">
               {isSignUp ? 'Crear cuenta' : 'Iniciar sesión'}
             </h2>
@@ -127,10 +132,13 @@ export default function Login() {
         {/* Derecha: Robot IA con animación de pulso */}
         <div className="hidden md:flex w-1/2 items-center justify-center bg-[#23272f] relative">
           <div className="flex flex-col items-center">
-            <div className="rounded-full bg-accent p-6 shadow-2xl animate-pulse cursor-pointer" onClick={() => window.openAssistantBubble && window.openAssistantBubble()}>
-              <FaRobot size={80} color="#0D1B2A" />
+              <div className="rounded-full bg-blue-600 p-6 shadow-2xl animate-pulse cursor-pointer" onClick={() => window.openAssistantBubble && window.openAssistantBubble()}>
+                <FaRobot size={80} color="#fff" />
             </div>
-            <span className="mt-6 text-lg font-semibold text-[#bfc8e6] font-poppins">Asistente IA</span>
+            <span className="mt-6 text-lg font-semibold text-[#bfc8e6] font-poppins">Dashboard IA</span>
+            <p className="mt-4 text-base text-gray-300 text-center max-w-xs">
+              Tu asistente inteligente para gestionar notas, recursos y eventos. Haz clic en el robot para abrir el chat y recibir ayuda personalizada sobre el uso de la plataforma.
+            </p>
           </div>
         </div>
       </div>

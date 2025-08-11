@@ -35,9 +35,9 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
             let iconElement = null;
             if (tipo?.icono) {
               if (tipo.icono.startsWith('fa-')) {
-                iconElement = <i className={`fa ${tipo.icono} text-2xl`} style={iconColor ? { color: iconColor } : {}}></i>;
+                iconElement = <i className={`fa ${tipo.icono} text-xl`} style={iconColor ? { color: iconColor } : {}}></i>;
               } else {
-                iconElement = <span className="text-2xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>;
+                iconElement = <span className="text-xl" style={iconColor ? { color: iconColor } : {}}>{tipo.icono}</span>;
               }
             }
             return (
@@ -58,7 +58,7 @@ export default function UpcomingEventsPanel({ events, tiposEventos }: { events: 
                 >
                   {iconElement}
                   <span
-                    className={`font-bold text-base truncate max-w-xs`}
+                    className={`font-normal text-base truncate max-w-xs`}
                     style={iconColor ? { color: iconColor } : {}}
                   >
                     {ev.title}

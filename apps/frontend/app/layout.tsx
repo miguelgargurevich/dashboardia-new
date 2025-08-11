@@ -1,6 +1,4 @@
 "use client";
-
-
 import "./globals.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Sidebar from "../components/Sidebar";
@@ -44,11 +42,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {!isLoginPage && (
           <>
             <header className="fixed top-0 left-20 right-0 h-16 bg-bg dark:bg-bg-dark border-b border-border dark:border-border-dark flex items-center px-8 z-40 shadow">
-              <div className="flex items-center gap-4">
-                <span className="text-2xl font-bold text-primary dark:text-primary">Dashborad IA</span>
-              </div>
+              
               <div className="ml-auto flex items-center gap-4">
                 <ThemeToggle />
+                <div className="flex items-center gap-4">
+                {session && session.user ? (
+                  <span className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400 dark:text-gray-500">Bienvenido:</span>
+                    <img
+                      src={session.user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${session.user.user_metadata?.name || session.user.email}`}
+                      alt="Avatar"
+                      className="w-7 h-7 rounded-full object-cover border border-gray-300 dark:border-gray-700 ml-2"
+                    />
+                  </span>
+                ) : (
+                  <span className="text-sm text-gray-400 dark:text-gray-500">Bienvenido</span>
+                )}
+              </div>
               </div>
             </header>
             <Sidebar />

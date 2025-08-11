@@ -1,6 +1,7 @@
 import { FaStickyNote, FaBook, FaCalendarAlt, FaUser, FaCog, FaTachometerAlt } from "react-icons/fa";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const menu = [
   { label: "Dashboard", icon: <FaTachometerAlt />, href: "/dashboard", type: "route" },
