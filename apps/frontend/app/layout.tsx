@@ -41,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-bg dark:bg-bg-dark">
         {!isLoginPage && (
           <>
-            <header className="fixed top-0 left-20 right-0 h-16 bg-bg dark:bg-bg-dark border-b border-border dark:border-border-dark flex items-center px-8 z-40 shadow">
+            <header className="fixed top-0 left-20 right-0 h-12 bg-bg dark:bg-bg-dark border-b border-border dark:border-border-dark flex items-center px-8 z-40 shadow">
               
               <div className="ml-auto flex items-center gap-4">
                 <ThemeToggle />
