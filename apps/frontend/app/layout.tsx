@@ -12,9 +12,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" suppressHydrationWarning>
       <body className="bg-bg dark:bg-bg-dark">
         {/* Cabecera global */}
-        <header className="fixed top-0 left-56 right-0 h-16 bg-bg dark:bg-bg-dark border-b border-border dark:border-border-dark flex items-center px-8 z-40 shadow">
+        <header className="fixed top-0 left-20 right-0 h-16 bg-bg dark:bg-bg-dark border-b border-border dark:border-border-dark flex items-center px-8 z-40 shadow">
           <div className="flex items-center gap-4">
-            <span className="text-2xl font-bold text-primary dark:text-primary"></span>
+            
+            <span className="text-2xl font-bold text-primary dark:text-primary">Dashborad IA</span>
           </div>
           <div className="ml-auto flex items-center gap-4">
             {/* Toggle de tema claro/oscuro */}
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         <Sidebar />
-        <main className="flex-1 ml-56 pt-16">{children}</main>
+        <main className="flex-1 ml-20 pt-16">{children}</main>
         <FloatingAssistant />
       </body>
     </html>

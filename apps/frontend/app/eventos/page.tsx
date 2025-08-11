@@ -35,7 +35,7 @@ function EventList({ events, selectedId, onSelect, tiposEventos, onNew, search, 
                   {iconElement && (
                     <span className="text-xl">{iconElement}</span>
                   )}
-                <span className="font-semibold text-gray-500 dark:text-gray-400">{event.title}</span>
+                <span className="font-normal text-gray-500 dark:text-gray-400">{event.title}</span>
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-200">{(() => {
                   if (!event.startDate) return "";

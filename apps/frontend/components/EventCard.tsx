@@ -13,7 +13,7 @@ export default function EventCard({ event }: any) {
         <span className="text-2xl text-primary dark:text-primary">
           {iconMap[event.eventType] || <FaCalendarAlt />}
         </span>
-        <h3 className="font-bold text-lg text-primary dark:text-primary flex-1">{event.title}</h3>
+        <h3 className="font-semibold text-lg text-primary dark:text-primary flex-1">{event.title}</h3>
         <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary dark:bg-primary/10 dark:text-primary uppercase">{event.eventType}</span>
       </div>
       <div className="text-gray-700 dark:text-gray-100 text-sm">{event.description}</div>
