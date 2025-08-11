@@ -19,11 +19,16 @@ export default function Sidebar() {
   };
   return (
     <aside className="fixed top-0 left-0 h-screen w-20 bg-white dark:bg-gray-950 shadow-lg flex flex-col py-6 px-1 z-40 border-r border-gray-200 dark:border-gray-800">
-      {/* Logo D más pequeño */}
+      {/* Logo D más pequeño, ahora clickeable para ir al home */}
       <div className="flex items-center justify-center mb-10">
-        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-primary text-white text-xl font-extrabold shadow" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <button
+          onClick={() => window.location.href = "/"}
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-primary text-white text-xl font-extrabold shadow focus:outline-none focus:ring-2 focus:ring-primary"
+          style={{ fontFamily: 'Inter, sans-serif' }}
+          title="Ir al inicio"
+        >
           D
-        </div>
+        </button>
       </div>
       <nav className="flex flex-col gap-6 flex-1">
         {menu.map((item) => (

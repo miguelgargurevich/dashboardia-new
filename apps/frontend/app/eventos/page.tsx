@@ -501,7 +501,7 @@ export default function EventosPage() {
   return (
     <div className="flex flex-col h-screen min-h-0 bg-bg dark:bg-bg-dark rounded-lg shadow overflow-hidden">
       <div className="w-full px-8 pt-4">
-        <h1 className="text-3xl font-bold mb-6 text-primary dark:text-primary">Gestión de Eventos</h1>
+        <h1 className="text-3xl font-bold mb-6 mt-8 ml-2 text-primary dark:text-primary">Gestión de Eventos</h1>
         <div className="flex gap-4 mb-4">
           <div className="relative w-64">
             <input

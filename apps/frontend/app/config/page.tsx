@@ -113,7 +113,7 @@ export default function ConfigTiposPage() {
 
   return (
     <div className="h-screen w-full bg-bg dark:bg-bg-dark p-8">
-      <h1 className="text-3xl font-bold text-primary dark:text-primary mb-8">Mantenimiento de tipos</h1>
+      <h1 className="text-3xl font-bold mb-6 mt-4 ml-2 text-primary dark:text-primary">Mantenimiento de tipos</h1>
       <div className="flex gap-4 mb-10">
         {tipoEndpoints.map(t => (
           <button
