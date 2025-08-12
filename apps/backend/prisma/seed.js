@@ -7,31 +7,7 @@ async function main() {
   // await prisma.resource.deleteMany({}); // No eliminar recursos existentes
   await prisma.note.deleteMany({});
   const now = new Date();
-  // Usuarios
-  const users = [
-    { name: 'Admin', email: 'admin@soporte.com', password: await bcrypt.hash('admin123', 10), role: 'admin' },
-    { name: 'Miguel Gargurevich', email: 'miguel.gargurevich@gmail.com', password: await bcrypt.hash('miguel123', 10), role: 'user' }
-  ];
-  let soporteUsers = [];
-  for (const u of users) {
-    const exists = await prisma.user.findUnique({ where: { email: u.email } });
-    let userRecord;
-    if (!exists) {
-      userRecord = await prisma.user.create({ data: u });
-    } else {
-      userRecord = await prisma.user.update({
-        where: { email: u.email },
-        data: {
-          name: u.name,
-          password: u.password,
-          role: u.role
-        }
-      });
-    }
-    if (userRecord.role === 'soporte') {
-      soporteUsers.push(userRecord);
-    }
-  }
+
   // Tipos de Eventos
   const tiposEventos = [
     { nombre: 'Capacitacion', icono: 'fa-graduation-cap', color: '#22c55e' },

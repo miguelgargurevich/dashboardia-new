@@ -304,32 +304,39 @@ Dashboard IA Soporte es una solución moderna para la gestión de soporte técni
 
 ---
 
+
 ## Autenticación
 
-El login utiliza los usuarios del seed del backend:
+La autenticación ahora se realiza completamente con Supabase Auth:
 
-- **admin@soporte.com / admin123**
-- **usuario@soporte.com / user123**
-- **miguel@soporte.com / miguel123**
-- **sofia@soporte.com / sofia456**
-- **carlos@soporte.com / carlos789**
+- **Email y contraseña:** Registro y login tradicional.
+- **Google:** Login con OAuth (Google).
+- **Teléfono y código SMS:** Login con número de teléfono y verificación OTP vía Twilio (SMS).
+
+Para el login por teléfono, el usuario ingresa su número, recibe un código SMS y lo verifica en el formulario. El backend de Supabase gestiona la autenticación y Twilio el envío de SMS.
+
+> **Nota:** Ya no se utiliza el seed de usuarios ni la autenticación personalizada del backend. Todo el flujo de login y registro es gestionado por Supabase Auth.
 
 ---
 
+
 ## Funcionalidades Destacadas
 
-- **Dashboard interactivo:** Panel principal con gráficas estadisticas de, eventos, recursos recientes y estadísticas semanales.
+- **Dashboard interactivo:** Panel principal con gráficas, eventos y recursos recientes.
 - **Eventos y calendario:** Gestión de eventos, calendario interactivo, notas diarias y eventos próximos.
-- **Base de conocimiento:** Acceso a manuales, procedimientos y recursos en markdown.
+- **Base de conocimiento:** Manuales y procedimientos en markdown.
 - **Recursos:** Subida, consulta y gestión de archivos recientes.
 - **Notas diarias:** Registro y consulta de notas diarias asociadas a eventos o usuarios.
+- **Login multi-método:**
+  - Email y contraseña (Supabase Auth)
+  - Google OAuth
+  - Teléfono y código SMS (OTP vía Twilio)
 - **Asistente IA (Chatbot):**
   - Flotante en el dashboard, visible solo para usuarios autenticados.
   - Consultas técnicas, ayuda guiada y registro de información.
-  - Soporte para adjuntar múltiples archivos (PDF, Word, Excel, imágenes, videos, texto) por drag & drop o selector.
+  - Soporte para adjuntar múltiples archivos (PDF, Word, Excel, imágenes, videos, texto).
   - Los archivos se envían al backend por el endpoint `/api/upload`.
-  - El asistente puede guiar el registro y enviar credenciales por correo.
-- **Personalización de Colores e Iconos:** Configuración de colores y fuentes desde el panel de configuración.
+- **Personalización de colores e iconos:** Configuración desde el panel de configuración.
 
 ---
 

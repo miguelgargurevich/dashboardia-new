@@ -12,6 +12,10 @@ import { FcGoogle } from 'react-icons/fc';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [showPhoneLogin, setShowPhoneLogin] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [success, setSuccess] = useState('');
@@ -23,6 +27,30 @@ export default function Login() {
     setSuccess("");
     try {
       const { supabase } = await import('../lib/supabaseClient');
+      if (showPhoneLogin) {
+        if (!otpSent) {
+          // Enviar OTP al teléfono
+          const { error } = await supabase.auth.signInWithOtp({ phone });
+          if (error) {
+            setError(error.message);
+            return;
+          }
+          setOtpSent(true);
+          setSuccess('Código enviado por SMS. Ingresa el código para continuar.');
+        } else {
+          // Verificar OTP
+          const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: 'sms' });
+          if (error) {
+            setError(error.message);
+            return;
+          }
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('close-assistant-bubble'));
+          }
+          router.push('/dashboard');
+        }
+        return;
+      }
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) {
@@ -65,27 +93,50 @@ export default function Login() {
               {isSignUp ? 'Crear cuenta' : 'Iniciar sesión'}
             </h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <input
-                type="email"
-                placeholder="Correo electrónico"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-[#1a2636]/80 text-white border border-accent focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-gray-300 font-inter"
-              />
-              <input
-                type="password"
-                placeholder="Contraseña"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-[#1a2636]/80 text-white border border-accent focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-gray-300 font-inter"
-              />
+              {!showPhoneLogin ? (
+                <>
+                  <input
+                    type="email"
+                    placeholder="Correo electrónico"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg bg-[#1a2636]/80 text-white border border-accent focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-gray-300 font-inter"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Contraseña"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg bg-[#1a2636]/80 text-white border border-accent focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-gray-300 font-inter"
+                  />
+                </>
+              ) : (
+                <>
+                  <input
+                    type="tel"
+                    placeholder="Teléfono (+51...)"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg bg-[#1a2636]/80 text-white border border-accent focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-gray-300 font-inter"
+                  />
+                  {otpSent && (
+                    <input
+                      type="text"
+                      placeholder="Código SMS"
+                      value={otp}
+                      onChange={e => setOtp(e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg bg-[#1a2636]/80 text-white border border-accent focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-gray-300 font-inter"
+                    />
+                  )}
+                </>
+              )}
               <button
                 type="submit"
                 className="w-full py-3 rounded-lg bg-[#23272f] text-[#bfc8e6] font-bold font-poppins hover:bg-[#353a45] transition-colors shadow-md"
               >
-                {isSignUp ? 'Registrarse' : 'Acceder'}
+                {showPhoneLogin ? (otpSent ? 'Verificar código' : 'Enviar código SMS') : (isSignUp ? 'Registrarse' : 'Acceder')}
               </button>
-              <div className="flex justify-center mt-2">
+              <div className="flex justify-center mt-2 gap-2">
                 <button
                   type="button"
                   className="text-xs text-accent underline hover:text-primary"
@@ -96,6 +147,20 @@ export default function Login() {
                   }}
                 >
                   {isSignUp ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
+                </button>
+                <button
+                  type="button"
+                  className="text-xs text-accent underline hover:text-primary"
+                  onClick={() => {
+                    setError("");
+                    setSuccess("");
+                    setShowPhoneLogin(!showPhoneLogin);
+                    setOtpSent(false);
+                    setPhone('');
+                    setOtp('');
+                  }}
+                >
+                  {showPhoneLogin ? 'Usar email y contraseña' : 'Acceder con teléfono'}
                 </button>
               </div>
               {error && (
@@ -132,12 +197,12 @@ export default function Login() {
         {/* Derecha: Robot IA con animación de pulso */}
         <div className="hidden md:flex w-1/2 items-center justify-center bg-[#23272f] relative">
           <div className="flex flex-col items-center">
-              <div className="rounded-full bg-blue-600 p-6 shadow-2xl animate-pulse cursor-pointer" onClick={() => window.openAssistantBubble && window.openAssistantBubble()}>
+              <div className="rounded-full bg-blue-600 p-6 shadow-2xl animate-pulse">
                 <FaRobot size={80} color="#fff" />
             </div>
             <span className="mt-6 text-lg font-semibold text-[#bfc8e6] font-poppins">Dashboard IA</span>
             <p className="mt-4 text-base text-gray-300 text-center max-w-xs">
-              Tu asistente inteligente para gestionar notas, recursos y eventos. Haz clic en el robot para abrir el chat y recibir ayuda personalizada sobre el uso de la plataforma.
+              Tu asistente inteligente para gestionar notas, recursos y eventos.
             </p>
           </div>
         </div>
